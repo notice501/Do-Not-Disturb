@@ -3,6 +3,7 @@ package foocoder.dnd.developer;
 import android.app.Application;
 
 import com.facebook.stetho.Stetho;
+import com.frogermcs.androiddevmetrics.AndroidDevMetrics;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -21,5 +22,6 @@ public class DeveloperSettings {
     public void apply() {
         Stetho.initializeWithDefaults(application);
         LeakCanary.install(application);
+        AndroidDevMetrics.initWith(application);
     }
 }

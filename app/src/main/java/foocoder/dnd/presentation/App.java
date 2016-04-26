@@ -28,11 +28,7 @@ public class App extends Application {
 
     private static App instance;
 
-    private static ProfileDBHelper dbHelper;
-
     private boolean _isUnavailable;
-
-    private SharedPreferenceUtil sp;
 
     private int originalHeight = 0;
 
@@ -43,7 +39,13 @@ public class App extends Application {
     private ApplicationComponent applicationComponent;
 
     @Inject
+    SharedPreferenceUtil sp;
+
+    @Inject
     Lazy<DeveloperSettings> developerSettingsLazy;
+
+    @Inject
+    ProfileDBHelper dbHelper;
 
     @Override
     public void onCreate() {
@@ -62,7 +64,6 @@ public class App extends Application {
             developerSettingsLazy.get().apply();
         }
 
-        dbHelper = new ProfileDBHelper(this, null, null, 1);
         instance = this;
         _isUnavailable = false;
     }
@@ -76,8 +77,6 @@ public class App extends Application {
     }
 
     public synchronized SharedPreferenceUtil getSharedPreferenceUtil() {
-        if (sp == null)
-            sp = new SharedPreferenceUtil(this);
         return sp;
     }
 
