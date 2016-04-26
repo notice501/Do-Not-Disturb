@@ -1,0 +1,21 @@
+#.gradle .idea and so on
+.*/
+
+#Intellij Idea files
+*.iml
+
+#All gradle projects' build files
+/**/build/
+
+#Android Studio captures folder
+captures/
+
+#Android Studio Navigation editor temp files
+.navigation/
+
+#All git ignore files
+!.gitignore
+
+#Local configuration file (sdk path, etc)
+local.properties
+

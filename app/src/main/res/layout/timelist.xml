@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/time_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:text="18:00 - 19:00"
+        android:textSize="@dimen/time_list_size"/>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/M"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/monday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/Tu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tuesday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/W"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wednesday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/Th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/thursday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/F"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/friday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/Sa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saturday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/Su"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sunday"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/time_list_size"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+</LinearLayout>

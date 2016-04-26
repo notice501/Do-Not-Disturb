@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">贴心勿扰</string>
+    <string name="action_settings">设置</string>
+
+    <string name="auto_recover">自动恢复</string>
+    <string name="auto_recover_explain">在进入活动状态后自动取消勿扰</string>
+    <string name="launch_settings">启用设置</string>
+    <string name="launch_settings_explain">设置内容生效，白名单来电等不静音</string>
+    <string name="dnd_in_time">定时勿扰</string>
+    <string name="dnd_in_time_explain">固定时间自动开启勿扰</string>
+    <string name="vibrate">震动</string>
+    <string name="vibrate_explain">启用震动</string>
+    <string name="white_list">白名单</string>
+    <string name="white_list_explain">允许这些人来电</string>
+    <string name="open_white_list">打开白名单设置</string>
+    <string name="repeated_call">重复来电</string>
+    <string name="repeated_calls_explain">三分钟内的第二个重复来电不会静音</string>
+    <string name="quick_start">快速启动</string>
+    <string name="show_more_settings">显示更多设置</string>
+    <string name="from">开始于</string>
+    <string name="from_time">12:00</string>
+    <string name="to">结束于</string>
+    <string name="to_time">13:00</string>
+    <string name="delete">Delete</string>
+    <string name="monday">一</string>
+    <string name="tuesday">二</string>
+    <string name="wednesday">三</string>
+    <string name="thursday">四</string>
+    <string name="friday">五</string>
+    <string name="saturday">六</string>
+    <string name="sunday">日</string>
+    <string name="complete">完成</string>
+    <string name="cancel">取消</string>
+    <string name="contact_cancel">取消</string>
+    <string name="contact_save">确定</string>
+    <string name="contact_hint">搜索</string>
+    <string name="stop">停止</string>
+    <string name="one_more_hour">加时</string>
+    <string name="plan">勿扰计划</string>
+    <string name="hint">提示</string>
+    <string name="hint_desc">计划列表已满</string>
+    <string name="manual_auto_cancel">手动勿扰模式中，检测到移动后会自动结束勿扰状态</string>
+    <string name="auto_task">该时段自动勿扰将于</string>
+    <string name="auto_task_over">结束</string>
+    <string name="running_hint">勿扰中</string>
+    <string name="manual">手动勿扰模式中</string>
+
+</resources>

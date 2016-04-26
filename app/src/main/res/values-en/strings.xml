@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Do Not Disturb</string>
+    <string name="action_settings">Settings</string>
+    <string name="auto_recover">Auto recovery</string>
+    <string name="cancel">Cancel</string>
+    <string name="complete">OK</string>
+    <string name="contact_cancel">Cancel</string>
+    <string name="contact_hint">Search</string>
+    <string name="contact_save">OK</string>
+    <string name="delete">Delete</string>
+    <string name="from">From</string>
+    <string name="from_time">12:00</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="to_time">13:00</string>
+    <string name="to">  To</string>
+    <string name="show_more_settings">Show more settings</string>
+    <string name="repeated_call">Repeated calls</string>
+    <string name="quick_start">Quick start</string>
+    <string name="vibrate_explain">Enable vibration</string>
+    <string name="white_list">Whitelist</string>
+    <string name="white_list_explain">Allow these people\'s incoming calls</string>
+    <string name="repeated_calls_explain">Second incoming within 3 Mins won\'t be silent</string>
+    <string name="saturday">Sat</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="sunday">Sun</string>
+    <string name="monday">Mon</string>
+    <string name="open_white_list">Open whitelist setting</string>
+    <string name="launch_settings">Enable settings</string>
+    <string name="launch_settings_explain">Incomings of whitelist won\'t be silent</string>
+    <string name="friday">Fri</string>
+    <string name="dnd_in_time">Timing task</string>
+    <string name="dnd_in_time_explain">Start the timing task in a set time</string>
+    <string name="stop">Stop</string>
+    <string name="one_more_hour">One more hour</string>
+    <string name="plan">Task</string>
+    <string name="auto_recover_explain">Auto-cancel when you move again</string>
+    <string name="hint">Hint</string>
+    <string name="hint_desc">Task list is full</string>
+    <string name="manual_auto_cancel">Manual task is running,it\'ll finish when your movement is detected</string>
+    <string name="auto_task">This task will complete at\n</string>
+    <string name="auto_task_over">\n</string>
+    <string name="running_hint">Running</string>
+    <string name="manual">Manual task is running</string>
+</resources>

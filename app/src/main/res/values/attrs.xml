@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="RoundAngleImageView">
+        <attr name="rndWidth" format="dimension" />
+        <attr name="rndHeight" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="RoundedLetterView">
+        <attr name="titleText" format="string" />
+        <attr name="titleSize" format="dimension" />
+        <attr name="titleColor" format="color" />
+        <attr name="backgroundColorValue" format="color" />
+    </declare-styleable>
+
+    <!--
+        SlidingDrawer specific attributes. These attributes are used to configure
+        a SlidingDrawer from XML.
+   -->
+    <declare-styleable name="SlidingDrawer">
+
+        <!-- Identifier for the child that represents the drawer's handle. -->
+        <attr name="handle" format="reference" />
+        <!-- Identifier for the child that represents the drawer's content. -->
+        <attr name="content" format="reference" />
+        <!-- Orientation of the SlidingDrawer. -->
+        <attr name="orientation" format="enum">
+            <enum name="topDown" value="1" />
+            <enum name="bottomUp" value="2" />
+            <enum name="leftToRight" value="4" />
+            <enum name="rightToLeft" value="8" />
+        </attr>
+        <!--
+             Indicates whether the drawer can be opened/closed by a single tap
+             on the handle.  (If false, the user must drag or fling, or click
+             using the trackball, to open/close the drawer.)  Default is true.
+        -->
+        <attr name="collapsedOffset" format="dimension" />
+        <attr name="expandedOffset" format="dimension" />
+        <attr name="allowSingleTap" format="boolean" />
+        <!--
+             Indicates whether the drawer should be opened/closed with an animation
+             when the user clicks the handle. Default is true.
+        -->
+        <attr name="animateOnClick" format="boolean" />
+    </declare-styleable>
+</resources>
