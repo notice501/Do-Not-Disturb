@@ -1,5 +1,7 @@
 package foocoder.dnd.presentation.view.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -138,5 +140,10 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
 
     protected ContactComponent getComponent() {
         return getApplicationComponent().plus(getActivityModule());
+    }
+
+    public static void start(Activity activity) {
+        Intent intent = new Intent(activity, ContactListActivity.class);
+        activity.startActivity(intent);
     }
 }

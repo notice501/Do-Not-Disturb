@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    tools:ignore="contentDescription">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:layout_gravity="bottom"
+            android:background="#353635"/>
+
+        <ImageButton
+            android:id="@+id/up_fab"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="32dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/small_button"
+            android:contentDescription="@string/show_more_settings"
+            android:src="@drawable/up_arrow"/>
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="#353635"/>
+
+    <RelativeLayout
+        android:id="@+id/timer_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#353635"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp">
+
+        <TextView
+            android:id="@+id/timer_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dnd_in_time"
+            android:textColor="#ffffff"
+            android:textSize="17sp"/>
+
+        <TextView
+            android:id="@+id/timer_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timer_title"
+            android:layout_marginTop="3dp"
+            android:text="@string/dnd_in_time_explain"
+            android:textSize="15sp"/>
+
+        <Switch
+            android:id="@+id/timer_swh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/timer_title"
+            android:background="@android:color/transparent"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/timepicker_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#353635"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
+        android:paddingTop="30dp"
+        android:visibility="visible">
+
+        <ListView
+            android:id="@+id/schs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            tools:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/add"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/schs"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/small_button"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_action_new"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#353635"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/shake_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/shake_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vibrate"
+                    android:textColor="#ffffff"
+                    android:textSize="17sp"/>
+
+                <TextView
+                    android:id="@+id/shake_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/shake_title"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/vibrate_explain"
+                    android:textSize="15sp"/>
+
+                <Switch
+                    android:id="@+id/vibr_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/shake_title"
+                    android:background="@android:color/transparent"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/white_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/white_btn"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/person"/>
+
+                <TextView
+                    android:id="@+id/white_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/white_btn"
+                    android:text="@string/white_list"
+                    android:textColor="#ffffff"
+                    android:textSize="17sp"/>
+
+                <TextView
+                    android:id="@+id/white_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/white_title"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/white_list_explain"
+                    android:textSize="15sp"/>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/repeat_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/repeat_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/repeated_call"
+                    android:textColor="#ffffff"
+                    android:textSize="17sp"/>
+
+                <TextView
+                    android:id="@+id/repeat_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/repeat_title"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/repeated_calls_explain"
+                    android:textSize="15sp"/>
+
+                <Switch
+                    android:id="@+id/repeat_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/repeat_title"
+                    android:background="@android:color/transparent"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

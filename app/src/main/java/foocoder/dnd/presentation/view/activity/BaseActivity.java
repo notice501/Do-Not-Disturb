@@ -1,6 +1,6 @@
 package foocoder.dnd.presentation.view.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 
 import foocoder.dnd.presentation.App;
 import foocoder.dnd.presentation.internal.di.components.ApplicationComponent;
@@ -8,7 +8,7 @@ import foocoder.dnd.presentation.internal.di.modules.ActivityModule;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
-public abstract class BaseActivity<T> extends AppCompatActivity {
+public abstract class BaseActivity<T> extends Activity {
 
     private CompositeSubscription subscriptions = new CompositeSubscription();
 

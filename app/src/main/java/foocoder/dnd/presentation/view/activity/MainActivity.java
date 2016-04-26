@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,22 +12,24 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
-import java.util.ArrayList;
+import com.jakewharton.rxbinding.view.RxView;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -39,7 +40,6 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import foocoder.dnd.R;
-import foocoder.dnd.domain.Contact;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.presentation.App;
 import foocoder.dnd.presentation.internal.di.components.MainComponent;
@@ -51,8 +51,9 @@ import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 import foocoder.dnd.views.TimeDialog;
+import rx.Subscription;
 
-import static foocoder.dnd.presentation.view.activity.ContactListActivity.RESULT_FINISH;
+import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 import static foocoder.dnd.utils.SharedPreferenceUtil.START;
 
 public final class MainActivity extends BaseActivity<MainComponent> implements MainSettingView {
@@ -63,8 +64,8 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @Inject
     SharedPreferenceUtil sp;
 
-    @BindView(R.id.container)
-    FrameLayout container;
+    @BindView(Window.ID_ANDROID_CONTENT)
+    ViewGroup container;
 
     @BindView(R.id.big_fab)
     ImageButton fab;
@@ -100,7 +101,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     RelativeLayout timepicker;
 
     @BindView(R.id.more_setting)
-    RelativeLayout more_setting;
+    ViewGroup more_setting;
 
     @Inject
     MainPresenter mainPresenter;
@@ -109,15 +110,11 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     private List<Schedule> schList;
 
-    private ArrayList<Contact> contacts;
-
     private ScheduleAdapter adapter;
 
     private TimeDialog addDialog;
 
     private TimeDialog itemDialog;
-
-    private static final int WHITE_LIST = 100;
 
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
@@ -132,31 +129,42 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     private int heightToScale;
 
     private int heightToMove;
+    private float translationY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listener = new MyListener();
-        open_setting = false;
-
         ButterKnife.bind(this);
         getComponent().inject(this);
         mainPresenter.bindView(this);
+
+        listener = new MyListener();
+        open_setting = false;
+
         sp.registerListener(listener);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         schList = global.getScheduleList();
-        contacts = new ArrayList<>();
-
-
 
         timepicker.setVisibility(sp.isQuiet() ? View.VISIBLE : View.GONE);
 
         adapter = new ScheduleAdapter(this, schList);
         schs.setAdapter(adapter);
         schs.setDivider(null);
+
+        getWindow().getDecorView().post(() -> {
+            originalHeight = more_setting.getHeight();
+            int[] points = new int[2];
+            fab.getLocationOnScreen(points);
+            translationY = container.getHeight() - TypedValue.applyDimension(COMPLEX_UNIT_DIP, 118, getResources().getDisplayMetrics());
+            heightToMove = (int) (translationY - container.getHeight() * 0.7);
+            heightToScale = (int) (container.getHeight() * 0.3f * 0.37f - (points[1] + fab.getHeight() / 2));
+            more_setting.setTranslationY(translationY);
+
+            initAnim();
+        });
     }
 
     @Override
@@ -169,139 +177,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         sp.unregisterListener(listener);
 
         super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case RESULT_FINISH:
-                contacts = data.getParcelableArrayListExtra("contacts");
-            case RESULT_OK:
-                contacts = data.getParcelableArrayListExtra("contacts");
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-        if (global.getOriginalHeight() == 0) {
-            originalHeight = more_setting.getMeasuredHeight();
-            global.setOriginalHeight(originalHeight);
-        } else {
-            originalHeight = global.getOriginalHeight();
-        }
-
-        if (sp.getHeightToMove() == 0) {
-            heightToMove = (int) (container.getMeasuredHeight() * 0.7);
-            sp.setHeightToMove(heightToMove);
-        } else {
-            heightToMove = sp.getHeightToMove();
-        }
-
-        if (sp.getHeightToScale() == 0) {
-            int[] points = new int[2];
-            fab.getLocationOnScreen(points);
-            heightToScale = (int) (container.getMeasuredHeight() * 0.3f * 0.37f - (points[1] + fab.getMeasuredHeight() / 2));
-            sp.setHeightToScale(heightToScale);
-        } else {
-            heightToScale = sp.getHeightToScale();
-        }
-
-        initAnim();
-    }
-
-    private void initAnim() {
-        final ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat("scaleX", 1f, 0.3f)
-                , PropertyValuesHolder.ofFloat("scaleY", 1f, 0.3f)
-                , PropertyValuesHolder.ofFloat("translationY", 1f, heightToScale));
-        scaleOpen.setDuration(220);
-
-        final RotateAnimation rotateOpen = new RotateAnimation(0, -180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotateOpen.setDuration(335);
-        rotateOpen.setFillAfter(true);
-
-        final ValueAnimator openSetting = ValueAnimator.ofInt(0, heightToMove);
-        openSetting.setDuration(300);
-        openSetting.setInterpolator(new LinearInterpolator());
-        openSetting.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-
-                up_fab.setImageResource(R.drawable.up_arrow);
-                up_fab.requestLayout();
-                scaleOpen.start();
-                up_fab.startAnimation(rotateOpen);
-            }
-        });
-        openSetting.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                ViewGroup.LayoutParams params = more_setting.getLayoutParams();
-                params.height = originalHeight + (Integer) animation.getAnimatedValue();
-
-                ViewGroup.MarginLayoutParams params1 = (ViewGroup.MarginLayoutParams) up_fab.getLayoutParams();
-                params1.setMargins(0, 0, originEnd, originBottom + (Integer) animation.getAnimatedValue());
-
-                more_setting.requestLayout();
-            }
-        });
-
-        final RotateAnimation rotateClose = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotateClose.setDuration(335);
-        rotateClose.setFillAfter(true);
-
-        final ValueAnimator closeSetting = ValueAnimator.ofInt(0, heightToMove);
-        closeSetting.setDuration(300);
-        closeSetting.setInterpolator(new LinearInterpolator());
-        closeSetting.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-
-                up_fab.setImageResource(R.drawable.down_arrow);
-                up_fab.requestLayout();
-                scaleOpen.reverse();
-                up_fab.startAnimation(rotateClose);
-            }
-        });
-        closeSetting.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                ViewGroup.LayoutParams params = more_setting.getLayoutParams();
-                params.height = originalHeight + heightToMove - (Integer) animation.getAnimatedValue();
-
-                ViewGroup.MarginLayoutParams params1 = (ViewGroup.MarginLayoutParams) up_fab.getLayoutParams();
-                params1.setMargins(0, 0, originEnd, originBottom - (Integer) animation.getAnimatedValue());
-
-                more_setting.requestLayout();
-            }
-        });
-
-        up_fab.setOnClickListener(view -> {
-            originEnd = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).rightMargin;
-            originBottom = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).bottomMargin;
-            if (!open_setting) {
-                open_setting = true;
-                scaleOpen.setStartDelay(100);
-                openSetting.start();
-            } else {
-                open_setting = false;
-                scaleOpen.setStartDelay(0);
-                closeSetting.start();
-
-            }
-        });
-
-        LayoutTransition transition = new LayoutTransition();
-        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(schs, PropertyValuesHolder.ofFloat("scaleY", 0, 1));
-        appear.setDuration(100);
-        appear.setInterpolator(new OvershootInterpolator());
-        transition.setAnimator(LayoutTransition.APPEARING, appear);
-        more_setting.setLayoutTransition(transition);
     }
 
     @OnCheckedChanged(R.id.recover_swh)
@@ -465,10 +340,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     @OnClick(R.id.white_btn)
     void onWhiteListClick(View view) {
-        Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
-        intent.putParcelableArrayListExtra("contacts", contacts);
-        intent.putExtra("firstLoad", contacts.size() == 0);
-        startActivityForResult(intent, WHITE_LIST);
+        ContactListActivity.start(this);
     }
 
     @Override
@@ -499,6 +371,67 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @Override
     public void changeRepetitionState(boolean enabled) {
         repeat_switch.setChecked(sp.isRepeated());
+    }
+
+    private void initAnim() {
+        final ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.3f)
+                , PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.3f)
+                , PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 1f, heightToScale));
+        scaleOpen.setDuration(220);
+
+        final RotateAnimation rotateOpen = new RotateAnimation(0, -180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateOpen.setDuration(335);
+        rotateOpen.setFillAfter(true);
+
+        ObjectAnimator openSetting = ObjectAnimator.ofFloat(more_setting, "translationY", translationY, heightToMove);
+        openSetting.setDuration(300);
+        openSetting.setInterpolator(new LinearInterpolator());
+        openSetting.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                up_fab.setImageResource(R.drawable.up_arrow);
+                scaleOpen.start();
+                up_fab.startAnimation(rotateOpen);
+            }
+        });
+
+        final RotateAnimation rotateClose = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotateClose.setDuration(335);
+        rotateClose.setFillAfter(true);
+
+        ObjectAnimator closeSetting = ObjectAnimator.ofFloat(more_setting, "translationY", heightToMove, translationY);
+        closeSetting.setDuration(300);
+        closeSetting.setInterpolator(new LinearInterpolator());
+        closeSetting.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                up_fab.setImageResource(R.drawable.down_arrow);
+                scaleOpen.reverse();
+                up_fab.startAnimation(rotateClose);
+            }
+        });
+
+        Subscription subscription = RxView.clicks(up_fab).subscribe(aVoid -> {
+            originEnd = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).rightMargin;
+            originBottom = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).bottomMargin;
+            if (!open_setting) {
+                open_setting = true;
+                scaleOpen.setStartDelay(100);
+                openSetting.start();
+            } else {
+                open_setting = false;
+                scaleOpen.setStartDelay(0);
+                closeSetting.start();
+            }
+        });
+        addSubscriptionsForUnbinding(subscription);
+
+        LayoutTransition transition = new LayoutTransition();
+        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(schs, PropertyValuesHolder.ofFloat(View.SCALE_Y, 0, 1));
+        appear.setDuration(100);
+        appear.setInterpolator(new OvershootInterpolator());
+        transition.setAnimator(LayoutTransition.APPEARING, appear);
+        more_setting.setLayoutTransition(transition);
     }
 
     private class MyListener implements SharedPreferences.OnSharedPreferenceChangeListener {

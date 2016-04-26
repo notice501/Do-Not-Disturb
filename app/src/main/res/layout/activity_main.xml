@@ -1,16 +1,17 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/container"
+    android:orientation="vertical"
     tools:context=".presentation.view.activity.MainActivity"
     tools:ignore="ContentDescription">
-    
+
     <RelativeLayout
         android:id="@+id/quick_start"
-        android:visibility="visible"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <ImageButton
             android:id="@+id/big_fab"
@@ -19,18 +20,17 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="89dp"
             android:background="@drawable/button"
-            android:contentDescription="@string/quick_start" />
-
+            android:contentDescription="@string/quick_start"/>
 
         <RelativeLayout
             android:id="@+id/recover_rl"
-            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/big_fab"
             android:layout_marginTop="48dp"
             android:paddingLeft="28dp"
-            android:paddingRight="28dp">
+            android:paddingRight="28dp"
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/recover_title"
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/auto_recover"
                 android:textColor="#ffffff"
-                android:textSize="17sp" />
+                android:textSize="17sp"/>
 
             <TextView
                 android:id="@+id/recover_content"
@@ -46,17 +46,17 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recover_title"
                 android:layout_marginTop="3dp"
-                android:textSize="15sp"
-                android:text="@string/auto_recover_explain" />
+                android:text="@string/auto_recover_explain"
+                android:textSize="15sp"/>
 
             <Switch
                 android:id="@+id/recover_swh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
-                android:layout_toEndOf="@id/recover_title"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_toEndOf="@id/recover_title"
+                android:background="#00000000"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/launch_settings"
                 android:textColor="#ffffff"
-                android:textSize="17sp" />
+                android:textSize="17sp"/>
 
             <TextView
                 android:id="@+id/setting_content"
@@ -82,212 +82,21 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/setting_title"
                 android:layout_marginTop="3dp"
-                android:textSize="15sp"
-                android:text="@string/launch_settings_explain" />
+                android:text="@string/launch_settings_explain"
+                android:textSize="15sp"/>
 
             <Switch
                 android:id="@+id/launch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/setting_title"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true" />
+                android:background="@android:color/transparent"/>
         </RelativeLayout>
     </RelativeLayout>
 
-    <RelativeLayout
+    <include
         android:id="@+id/more_setting"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_gravity="bottom"
-        android:background="#353635"
-        android:paddingLeft="28dp"
-        android:paddingRight="28dp" >
-
-        <RelativeLayout
-            android:id="@+id/timer_rl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp">
-
-            <TextView
-                android:id="@+id/timer_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dnd_in_time"
-                android:textColor="#ffffff"
-                android:textSize="17sp" />
-
-            <TextView
-                android:id="@+id/timer_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/timer_title"
-                android:layout_marginTop="3dp"
-                android:textSize="15sp"
-                android:text="@string/dnd_in_time_explain" />
-
-            <Switch
-                android:id="@+id/timer_swh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:layout_toEndOf="@id/timer_title"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/timepicker_rl"
-            android:layout_below="@id/timer_rl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:visibility="visible">
-
-            <ListView
-                android:id="@+id/schs"
-                android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <!--android:background="@drawable/ripple" />-->
-            <ImageButton
-                android:id="@+id/add"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/schs"
-                android:layout_marginTop="6dp"
-                android:src="@drawable/ic_action_new"
-                android:background="@drawable/small_button"
-                android:layout_centerHorizontal="true"/>
-        </RelativeLayout>
-
-        <ScrollView
-            android:layout_below="@id/timepicker_rl"
-            android:scrollbars="none"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <RelativeLayout
-                    android:id="@+id/shake_rl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/shake_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/vibrate"
-                        android:textColor="#ffffff"
-                        android:textSize="17sp" />
-
-                    <TextView
-                        android:id="@+id/shake_content"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/shake_title"
-                        android:layout_marginTop="3dp"
-                        android:textSize="15sp"
-                        android:text="@string/vibrate_explain" />
-
-                    <Switch
-                        android:id="@+id/vibr_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:layout_toEndOf="@id/shake_title"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/white_rl"
-                    android:layout_below="@id/shake_rl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/white_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/white_list"
-                        android:textColor="#ffffff"
-                        android:textSize="17sp" />
-
-                    <TextView
-                        android:id="@+id/white_content"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/white_title"
-                        android:layout_marginTop="3dp"
-                        android:textSize="15sp"
-                        android:text="@string/white_list_explain" />
-
-                    <ImageView
-                        android:id="@+id/white_btn"
-                        android:src="@drawable/person"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/repeat_rl"
-                    android:layout_below="@id/white_rl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/repeat_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/repeated_call"
-                        android:textColor="#ffffff"
-                        android:textSize="17sp" />
-
-                    <TextView
-                        android:id="@+id/repeat_content"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/repeat_title"
-                        android:layout_marginTop="3dp"
-                        android:textSize="15sp"
-                        android:text="@string/repeated_calls_explain" />
-
-                    <Switch
-                        android:id="@+id/repeat_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:layout_toEndOf="@id/repeat_title"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"/>
-                </RelativeLayout>
-            </RelativeLayout>
-        </ScrollView>
-    </RelativeLayout>
-
-    <ImageButton
-        android:id="@+id/up_fab"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="28dp"
-        android:src="@drawable/up_arrow"
-        android:background="@drawable/small_button"
-        android:contentDescription="@string/show_more_settings"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="80dp" />
+        layout="@layout/more_settings"/>
 </FrameLayout>
