@@ -15,4 +15,6 @@ public interface ApplicationComponent {
     void inject(App app);
 
     ContactComponent plus(ActivityModule activityModule);
+
+    MainComponent add(ActivityModule activityModule);
 }

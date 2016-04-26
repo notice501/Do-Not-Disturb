@@ -28,6 +28,12 @@ public class ApplicationModule {
     }
 
     @Provides
+    @Singleton
+    App provideApp() {
+        return this.app;
+    }
+
+    @Provides
     ProfileDBHelper provideProfileDBHelper() {
         return new ProfileDBHelper(app, null, null, 1);
     }

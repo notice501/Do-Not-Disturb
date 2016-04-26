@@ -32,13 +32,13 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_SUN = "sunday";
     public static final String COLUMN_CONTACT_NAME = "name";
     public static final String COLUMN_CONTACT_PHONENUM = "phoneNum";
-    public static final String COLUMN_STATE = "state";
-    public static final String COLUMN_TYPE = "type";
-    private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "profiles.db";
+
     private static final String TABLE_TEMP_NUMBERS = "temp_numbers";
     private static final String TABLE_SCHEDULES = "schedules";
     private static final String TABLE_CONTACTS = "contacts";
+
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "profiles.db";
 
     public ProfileDBHelper(Context context, String name, CursorFactory factory,
                            int version) {
@@ -50,7 +50,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " +
                 TABLE_CONTACTS + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ID + " TEXT, "
                 + COLUMN_CONTACT_NAME + " TEXT, "
                 + COLUMN_CONTACT_PHONENUM + " TEXT" + ")";
 

@@ -6,17 +6,13 @@ import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -30,53 +26,86 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-
-import com.gc.materialdesign.views.ButtonFloatSmall;
+import android.widget.Switch;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
 import foocoder.dnd.R;
-import foocoder.dnd.presentation.App;
 import foocoder.dnd.domain.Contact;
 import foocoder.dnd.domain.Schedule;
+import foocoder.dnd.presentation.App;
+import foocoder.dnd.presentation.internal.di.components.MainComponent;
+import foocoder.dnd.presentation.internal.di.modules.ActivityModule;
+import foocoder.dnd.presentation.presenter.MainPresenter;
+import foocoder.dnd.presentation.view.MainSettingView;
+import foocoder.dnd.presentation.view.adapter.ScheduleAdapter;
 import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
-import foocoder.dnd.presentation.view.SettingView;
-import foocoder.dnd.presentation.view.adapter.ScheduleAdapter;
 import foocoder.dnd.views.TimeDialog;
 
-import static foocoder.dnd.utils.SharedPreferenceUtil.START;
 import static foocoder.dnd.presentation.view.activity.ContactListActivity.RESULT_FINISH;
+import static foocoder.dnd.utils.SharedPreferenceUtil.START;
 
-public final class MainActivity extends BaseActivity implements SettingView {
+public final class MainActivity extends BaseActivity<MainComponent> implements MainSettingView {
 
-    private FrameLayout container;
+    @Inject
+    App global;
 
-    private App global;
+    @Inject
+    SharedPreferenceUtil sp;
 
-    private SharedPreferenceUtil sp;
+    @BindView(R.id.container)
+    FrameLayout container;
+
+    @BindView(R.id.big_fab)
+    ImageButton fab;
+
+    @BindView(R.id.recover_swh)
+    Switch recover_swh;
+
+    @BindView(R.id.launch)
+    Switch launch;
+
+    @BindView(R.id.timer_swh)
+    Switch timer_swh;
+
+    @BindView(R.id.add)
+    ImageButton add;
+
+    @BindView(R.id.schs)
+    ListView schs;
+
+    @BindView(R.id.vibr_switch)
+    Switch vibr_switch;
+
+    @BindView(R.id.white_btn)
+    ImageView white_btn;
+
+    @BindView(R.id.repeat_switch)
+    Switch repeat_switch;
+
+    @BindView(R.id.up_fab)
+    ImageButton up_fab;
+
+    @BindView(R.id.timepicker_rl)
+    RelativeLayout timepicker;
+
+    @BindView(R.id.more_setting)
+    RelativeLayout more_setting;
+
+    @Inject
+    MainPresenter mainPresenter;
 
     private AudioManager audio;
-
-    private AlarmManager alarmManager;
-
-    private ImageButton fab;
-
-    //    private Switch recover_swh;
-    private SwitchCompat recover_swh;
-
-    private SwitchCompat launch;
-
-    private SwitchCompat timer_swh;
-
-    //    private ImageButton add;
-    private ButtonFloatSmall add;
-
-    private ListView schs;
 
     private List<Schedule> schList;
 
@@ -87,22 +116,6 @@ public final class MainActivity extends BaseActivity implements SettingView {
     private TimeDialog addDialog;
 
     private TimeDialog itemDialog;
-
-    private SwitchCompat vibr_switch;
-
-    private ImageView white_btn;
-
-    private SwitchCompat repeat_switch;
-
-    private ImageButton up_fab;
-
-    private RelativeLayout timepicker;
-
-    private RelativeLayout recover_rl;
-
-    private RelativeLayout more_setting;
-
-    private ScrollView settings;
 
     private static final int WHITE_LIST = 100;
 
@@ -129,226 +142,26 @@ public final class MainActivity extends BaseActivity implements SettingView {
         open_setting = false;
 
         ButterKnife.bind(this);
-
-        global = (App) App.getContext();
-        sp = global.getSharedPreferenceUtil();
+        getComponent().inject(this);
+        mainPresenter.bindView(this);
         sp.registerListener(listener);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         schList = global.getScheduleList();
         contacts = new ArrayList<>();
 
-        container = (FrameLayout) findViewById(R.id.container);
-        recover_rl = (RelativeLayout) findViewById(R.id.recover_rl);
-        fab = (ImageButton) findViewById(R.id.big_fab);
-        fab.setImageResource(global.get_isUnavailable() ? R.drawable.shut12 : R.drawable.shut1);
-        fab.setOnClickListener(view -> sendBroadcast(new Intent().setAction(App.START_STOP_ACTION)));
 
-        recover_swh = (SwitchCompat) findViewById(R.id.recover_swh);
-        recover_swh.setChecked(sp.isRecoverable());
-        recover_swh.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sp.setRecover(isChecked);
 
-            if (sp.isStarted()) {
-                if (isChecked) {
-//                    startService(new Intent(MainActivity.this, StepService.class));
-                    startService(new Intent(MainActivity.this, ListenerService.class).putExtra("note", getString(R.string.manual_auto_cancel)));
-                } else {
-//                    stopService(new Intent(MainActivity.this, StepService.class));
-                }
-            }
-        });
-
-        launch = (SwitchCompat) findViewById(R.id.launch);
-        launch.setChecked(sp.isLaunched());
-        launch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sp.setLaunch(isChecked);
-
-                if (isChecked) {
-                    if (sp.isStarted()) {
-                        if (sp.isVib()) {
-                            audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-                        }
-                    } else {
-                        if (sp.isQuiet()) {
-//                            startService(new Intent(MainActivity.this,TimeService.class));
-                        }
-                    }
-                } else {
-                    if (sp.isStarted()) {
-                        if (sp.isVib()) {
-                            switch (audio.getRingerMode()) {
-                                case AudioManager.RINGER_MODE_NORMAL:
-                                    audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                                case AudioManager.RINGER_MODE_VIBRATE:
-                                    audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                            }
-                        }
-                    } else {
-                        if (sp.isQuiet()) {
-//                            stopService(new Intent(MainActivity.this,TimeService.class));
-                        }
-                    }
-                }
-            }
-        });
-
-        timepicker = (RelativeLayout) findViewById(R.id.timepicker_rl);
         timepicker.setVisibility(sp.isQuiet() ? View.VISIBLE : View.GONE);
-        timer_swh = (SwitchCompat) findViewById(R.id.timer_swh);
-        timer_swh.setChecked(sp.isQuiet());
-        timer_swh.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i("timer", isChecked + "");
-                sp.setQuiet(isChecked);
-                timepicker.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-
-                if (isChecked) {
-                    if (!sp.isStarted()) {
-                        if (global.getScheduleList().size() > 0) {
-                            for (Schedule schedule : global.getScheduleList()) {
-                                AlarmUtil.startSchedule(MainActivity.this, schedule);
-                            }
-                        }
-                    }
-                } else {
-                    if (!sp.isStarted()) {
-                        if (global.getScheduleList().size() > 0) {
-                            for (Schedule schedule : global.getScheduleList()) {
-                                AlarmUtil.cancelOldAlarm(MainActivity.this, schedule);
-//                                    stopService(new Intent(MainActivity.this,ListenerService.class));
-                            }
-                            sp.setRunningId(-1);
-                            sp.enable(false);
-                        }
-                    }
-                }
-            }
-        });
 
         adapter = new ScheduleAdapter(this, schList);
-        schs = (ListView) findViewById(R.id.schs);
         schs.setAdapter(adapter);
         schs.setDivider(null);
-        schs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                final int position = i;
-                itemDialog = new TimeDialog(schList.get(position), MainActivity.this, new TimeDialog.OnCustomDialogListener() {
-                    @Override
-                    public void back(Schedule sch) {
-                        if (sch.isDel()) {
-                            AlarmUtil.cancelOldAlarm(MainActivity.this, sch);
-                            schList.remove(sch);
-                            global.delSchedule(sch);
-                            if (schList.size() == 0) {
-                                sp.setRunningId(-1);
-                            }
-                        } else {
-                            schList.set(position, sch);
-                            global.updateSchedule(sch);
-                            if (!sp.isStarted()) {
-                                AlarmUtil.startSchedule(MainActivity.this, sch);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                itemDialog.show();
-            }
-        });
+    }
 
-        add = (ButtonFloatSmall) findViewById(R.id.add);
-        add.setDrawableIcon(getResources().getDrawable(R.drawable.ic_action_new));
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addDialog = new TimeDialog(MainActivity.this, new TimeDialog.OnCustomDialogListener() {
-
-                    @Override
-                    public void back(Schedule sch) {
-                        if (sch.isDel()) {
-                            schList.remove(sch);
-                            global.delSchedule(sch);
-                        } else {
-                            if (schList.size() >= 5) {
-                                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                                alert.setTitle(getString(R.string.hint))
-                                        .setMessage(R.string.hint_desc)
-                                        .setPositiveButton(R.string.complete, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).create().show();
-                                return;
-                            }
-                            int _id = sp.getId() + 2;
-                            sch.setId(_id);
-                            sp.setId(_id);
-                            if (!sp.isStarted()) {
-                                AlarmUtil.startSchedule(MainActivity.this, sch);
-                            }
-                            schList.add(sch);
-                            global.saveSchedule(sch);
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                addDialog.show();
-            }
-        });
-
-        vibr_switch = (SwitchCompat) findViewById(R.id.vibr_switch);
-        vibr_switch.setChecked(sp.isVib());
-        vibr_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sp.setVib(isChecked);
-
-                if (sp.isLaunched()) {
-                    if (isChecked) {
-                        if (sp.isStarted()) {
-                            audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-                        }
-                    } else {
-                        if (sp.isStarted()) {
-                            if (audio.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-                                audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        white_btn = (ImageView) findViewById(R.id.white_btn);
-        white_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
-                intent.putParcelableArrayListExtra("contacts", contacts);
-                intent.putExtra("firstLoad", contacts.size() == 0);
-                startActivityForResult(intent, WHITE_LIST);
-            }
-        });
-
-        repeat_switch = (SwitchCompat) findViewById(R.id.repeat_switch);
-        repeat_switch.setChecked(sp.isRepeated());
-        repeat_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sp.setRepeat(isChecked);
-            }
-        });
-
-        more_setting = (RelativeLayout) findViewById(R.id.more_setting);
-        up_fab = (ImageButton) findViewById(R.id.up_fab);
-//        initAnim();
+    @Override
+    protected MainComponent getComponent() {
+        return getApplicationComponent().add(new ActivityModule(this));
     }
 
     @Override
@@ -468,21 +281,18 @@ public final class MainActivity extends BaseActivity implements SettingView {
             }
         });
 
-        up_fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                originEnd = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).rightMargin;
-                originBottom = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).bottomMargin;
-                if (open_setting == false) {
-                    open_setting = true;
-                    scaleOpen.setStartDelay(100);
-                    openSetting.start();
-                } else {
-                    open_setting = false;
-                    scaleOpen.setStartDelay(0);
-                    closeSetting.start();
+        up_fab.setOnClickListener(view -> {
+            originEnd = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).rightMargin;
+            originBottom = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).bottomMargin;
+            if (!open_setting) {
+                open_setting = true;
+                scaleOpen.setStartDelay(100);
+                openSetting.start();
+            } else {
+                open_setting = false;
+                scaleOpen.setStartDelay(0);
+                closeSetting.start();
 
-                }
             }
         });
 
@@ -494,18 +304,213 @@ public final class MainActivity extends BaseActivity implements SettingView {
         more_setting.setLayoutTransition(transition);
     }
 
+    @OnCheckedChanged(R.id.recover_swh)
+    void onRecoverSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
+        sp.setRecover(isChecked);
+
+        if (sp.isStarted()) {
+            if (isChecked) {
+                startService(new Intent(MainActivity.this, ListenerService.class).putExtra("note", getString(R.string.manual_auto_cancel)));
+            }
+
+        }
+    }
+
+    @OnCheckedChanged(R.id.launch)
+    void onLaunchSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
+        sp.setLaunch(isChecked);
+
+        if (isChecked) {
+            if (sp.isStarted()) {
+                if (sp.isVib()) {
+                    audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                }
+            } else {
+                if (sp.isQuiet()) {
+//                            startService(new Intent(MainActivity.this,TimeService.class));
+                }
+            }
+        } else {
+            if (sp.isStarted()) {
+                if (sp.isVib()) {
+                    switch (audio.getRingerMode()) {
+                        case AudioManager.RINGER_MODE_NORMAL:
+                            audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        case AudioManager.RINGER_MODE_VIBRATE:
+                            audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    }
+                }
+            } else {
+                if (sp.isQuiet()) {
+//                            stopService(new Intent(MainActivity.this,TimeService.class));
+                }
+            }
+        }
+    }
+
+    @OnCheckedChanged(R.id.timer_swh)
+    void onTimerSwitchCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        sp.setQuiet(isChecked);
+        timepicker.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+        if (isChecked) {
+            if (!sp.isStarted()) {
+                if (global.getScheduleList().size() > 0) {
+                    for (Schedule schedule : global.getScheduleList()) {
+                        AlarmUtil.startSchedule(MainActivity.this, schedule);
+                    }
+                }
+            }
+        } else {
+            if (!sp.isStarted()) {
+                if (global.getScheduleList().size() > 0) {
+                    for (Schedule schedule : global.getScheduleList()) {
+                        AlarmUtil.cancelOldAlarm(MainActivity.this, schedule);
+//                                    stopService(new Intent(MainActivity.this,ListenerService.class));
+                    }
+                    sp.setRunningId(-1);
+                    sp.enable(false);
+                }
+            }
+        }
+    }
+
+    @OnCheckedChanged(R.id.vibr_switch)
+    void onVibrateSwitchCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        sp.setVib(isChecked);
+
+        if (sp.isLaunched()) {
+            if (isChecked) {
+                if (sp.isStarted()) {
+                    audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                }
+            } else {
+                if (sp.isStarted()) {
+                    if (audio.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+                        audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    }
+                }
+            }
+        }
+    }
+
+    @OnCheckedChanged(R.id.repeat_switch)
+    void onRepeatSwitchCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        sp.setRepeat(isChecked);
+    }
+
+    @OnItemClick(R.id.schs)
+    void onScheduleListItemClick(AdapterView<?> parent, View view, int position, long id) {
+        itemDialog = new TimeDialog(schList.get(position), MainActivity.this, new TimeDialog.OnCustomDialogListener() {
+            @Override
+            public void back(Schedule sch) {
+                if (sch.isDel()) {
+                    AlarmUtil.cancelOldAlarm(MainActivity.this, sch);
+                    schList.remove(sch);
+                    global.delSchedule(sch);
+                    if (schList.size() == 0) {
+                        sp.setRunningId(-1);
+                    }
+                } else {
+                    schList.set(position, sch);
+                    global.updateSchedule(sch);
+                    if (!sp.isStarted()) {
+                        AlarmUtil.startSchedule(MainActivity.this, sch);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+        itemDialog.show();
+    }
+
+    @OnClick(R.id.add)
+    void onAddClick() {
+        addDialog = new TimeDialog(MainActivity.this, new TimeDialog.OnCustomDialogListener() {
+
+            @Override
+            public void back(Schedule sch) {
+                if (sch.isDel()) {
+                    schList.remove(sch);
+                    global.delSchedule(sch);
+                } else {
+                    if (schList.size() >= 5) {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                        alert.setTitle(getString(R.string.hint))
+                                .setMessage(R.string.hint_desc)
+                                .setPositiveButton(R.string.complete, (dialog, which) -> {
+                                    dialog.dismiss();
+                                }).create().show();
+                        return;
+                    }
+                    int _id = sp.getId() + 2;
+                    sch.setId(_id);
+                    sp.setId(_id);
+                    if (!sp.isStarted()) {
+                        AlarmUtil.startSchedule(MainActivity.this, sch);
+                    }
+                    schList.add(sch);
+                    global.saveSchedule(sch);
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+        addDialog.show();
+    }
+
+    @OnClick(R.id.big_fab)
+    void onFabClick(View view) {
+        sendBroadcast(new Intent().setAction(App.START_STOP_ACTION));
+    }
+
+    @OnClick(R.id.white_btn)
+    void onWhiteListClick(View view) {
+        Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
+        intent.putParcelableArrayListExtra("contacts", contacts);
+        intent.putExtra("firstLoad", contacts.size() == 0);
+        startActivityForResult(intent, WHITE_LIST);
+    }
+
+    @Override
+    public void changeState(boolean enabled) {
+        fab.setImageResource(enabled ? R.drawable.shut12 : R.drawable.shut1);
+    }
+
+    @Override
+    public void changeAutoRecoverState(boolean enabled) {
+        recover_swh.setChecked(sp.isRecoverable());
+    }
+
+    @Override
+    public void changeLauncherState(boolean enabled) {
+        launch.setChecked(sp.isLaunched());
+    }
+
+    @Override
+    public void changeTimerState(boolean enabled) {
+        timer_swh.setChecked(sp.isQuiet());
+    }
+
+    @Override
+    public void changeVibrationState(boolean enabled) {
+        vibr_switch.setChecked(sp.isVib());
+    }
+
+    @Override
+    public void changeRepetitionState(boolean enabled) {
+        repeat_switch.setChecked(sp.isRepeated());
+    }
+
     private class MyListener implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(START)) {
                 AnimationDrawable animationDrawable;
                 if (sharedPreferences.getBoolean(START, false)) {
-//                    recover_rl.setVisibility(View.VISIBLE);
                     fab.setImageResource(R.drawable.shutup);
                     animationDrawable = (AnimationDrawable) fab.getDrawable();
                     animationDrawable.start();
                 } else {
-//                    recover_rl.setVisibility(View.INVISIBLE);
                     fab.setImageResource(R.drawable.openup);
                     animationDrawable = (AnimationDrawable) fab.getDrawable();
                     animationDrawable.start();

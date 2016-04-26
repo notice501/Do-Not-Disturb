@@ -30,7 +30,7 @@ import timber.log.Timber;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public final class ContactListActivity extends BaseActivity implements ContactListView {
+public final class ContactListActivity extends BaseActivity<ContactComponent> implements ContactListView {
 
     public static final int RESULT_FINISH = 999;
 
@@ -136,7 +136,7 @@ public final class ContactListActivity extends BaseActivity implements ContactLi
         }
     }
 
-    private ContactComponent getComponent() {
+    protected ContactComponent getComponent() {
         return getApplicationComponent().plus(getActivityModule());
     }
 }

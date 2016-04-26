@@ -1,10 +1,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    tools:context=".MainActivity">
+    tools:context=".presentation.view.activity.MainActivity"
+    tools:ignore="ContentDescription">
+    
     <RelativeLayout
         android:id="@+id/quick_start"
         android:visibility="visible"
@@ -24,7 +25,7 @@
         <RelativeLayout
             android:id="@+id/recover_rl"
             android:visibility="visible"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/big_fab"
             android:layout_marginTop="48dp"
@@ -48,18 +49,19 @@
                 android:textSize="15sp"
                 android:text="@string/auto_recover_explain" />
 
-            <android.support.v7.widget.SwitchCompat
+            <Switch
                 android:id="@+id/recover_swh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true" />
+                android:layout_toEndOf="@id/recover_title"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/setting_rl"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/recover_rl"
             android:layout_marginTop="30dp"
@@ -83,14 +85,13 @@
                 android:textSize="15sp"
                 android:text="@string/launch_settings_explain" />
 
-            <!--<Switch-->
-            <android.support.v7.widget.SwitchCompat
+            <Switch
                 android:id="@+id/launch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:layout_toEndOf="@id/setting_title"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true" />
         </RelativeLayout>
     </RelativeLayout>
@@ -106,7 +107,7 @@
 
         <RelativeLayout
             android:id="@+id/timer_rl"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp">
 
@@ -127,21 +128,20 @@
                 android:textSize="15sp"
                 android:text="@string/dnd_in_time_explain" />
 
-            <!--<Switch-->
-            <android.support.v7.widget.SwitchCompat
+            <Switch
                 android:id="@+id/timer_swh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:layout_toEndOf="@id/timer_title"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true" />
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/timepicker_rl"
             android:layout_below="@id/timer_rl"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:visibility="visible">
@@ -152,23 +152,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!--<ImageButton-->
-            <!--android:id="@+id/add"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@id/schs"-->
-            <!--android:src="@drawable/ic_action_new"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--android:padding="10dp"-->
             <!--android:background="@drawable/ripple" />-->
-            <com.gc.materialdesign.views.ButtonFloatSmall
+            <ImageButton
                 android:id="@+id/add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/schs"
                 android:layout_marginTop="6dp"
-                android:background="@color/bt_color"
-                android:layout_centerHorizontal="true" />
+                android:src="@drawable/ic_action_new"
+                android:background="@drawable/small_button"
+                android:layout_centerHorizontal="true"/>
         </RelativeLayout>
 
         <ScrollView
@@ -179,11 +172,11 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <RelativeLayout
                     android:id="@+id/shake_rl"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:visibility="visible">
@@ -205,21 +198,20 @@
                         android:textSize="15sp"
                         android:text="@string/vibrate_explain" />
 
-                    <!--<Switch-->
-                    <android.support.v7.widget.SwitchCompat
+                    <Switch
                         android:id="@+id/vibr_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
+                        android:layout_toEndOf="@id/shake_title"
                         android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
                         android:layout_centerVertical="true" />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/white_rl"
                     android:layout_below="@id/shake_rl"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:visibility="visible">
@@ -247,15 +239,13 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:contentDescription="@string/open_white_list" />
+                        android:layout_alignParentEnd="true" />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/repeat_rl"
                     android:layout_below="@id/white_rl"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:visibility="visible">
@@ -277,14 +267,14 @@
                         android:textSize="15sp"
                         android:text="@string/repeated_calls_explain" />
 
-                    <!--<Switch-->
-                    <android.support.v7.widget.SwitchCompat
+                    <Switch
                         android:id="@+id/repeat_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true"/>
+                        android:layout_toEndOf="@id/repeat_title"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"/>
                 </RelativeLayout>
             </RelativeLayout>
         </ScrollView>
@@ -295,7 +285,6 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="28dp"
-        android:layout_marginRight="28dp"
         android:src="@drawable/up_arrow"
         android:background="@drawable/small_button"
         android:contentDescription="@string/show_more_settings"

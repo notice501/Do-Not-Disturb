@@ -88,10 +88,6 @@ public class App extends Application {
         this._isUnavailable = _flag;
     }
 
-//    public void saveNumber(String number,long time){
-//        dbHelper.saveNumber(number, time);
-//    }
-
 
     public int getOriginalHeight() {
         return originalHeight;
@@ -108,7 +104,6 @@ public class App extends Application {
                 CallLog.Calls.DATE + ">= ? AND " + CallLog.Calls.NUMBER + " = ? ", new String[]{cutOffTime + "", number},
                 CallLog.Calls.DEFAULT_SORT_ORDER);
 
-//        return dbHelper.searchNumber(number) > 0;
         return c != null && c.moveToNext();
     }
 
@@ -132,21 +127,8 @@ public class App extends Application {
         return dbHelper.getScheduleList();
     }
 
-//    public Schedule getSchedule(long _id){
-//        return dbHelper.getSchedule(_id);
-//    }
-
     public boolean delSchedule(Schedule sch) {
         return dbHelper.delSchedule(sch);
-    }
-
-    public List<Schedule> getScheduleByDay(String dayOfWeek) {
-        return dbHelper.getScheduleByDay(dayOfWeek);
-    }
-
-    public void saveContacts(List<Contact> contacts, String state) {
-//        dbHelper.clearContacts(state);
-//        dbHelper.saveContacts(contacts,state);
     }
 
     public List<Contact> getContacts() {
