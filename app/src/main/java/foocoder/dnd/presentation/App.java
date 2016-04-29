@@ -25,24 +25,21 @@ import timber.log.Timber;
 
 public class App extends Application {
 
-    private static App instance;
-
-    private boolean _isUnavailable;
-
     public static final String START_STOP_ACTION = "foocoder.dnd.startstop";
-
     public static final String AUTO_TIME_SCHEDULE = "foocoder.dnd.auto";
-
-    private ApplicationComponent applicationComponent;
-
+    private static App instance;
     @Inject
     SharedPreferenceUtil sp;
-
     @Inject
     Lazy<DeveloperSettings> developerSettingsLazy;
-
     @Inject
     ProfileDBHelper dbHelper;
+    private boolean _isUnavailable;
+    private ApplicationComponent applicationComponent;
+
+    public static App getContext() {
+        return instance;
+    }
 
     @Override
     public void onCreate() {
@@ -64,10 +61,6 @@ public class App extends Application {
 
         instance = this;
         _isUnavailable = false;
-    }
-
-    public static App getContext() {
-        return instance;
     }
 
     public ApplicationComponent getApplicationComponent() {
@@ -98,10 +91,6 @@ public class App extends Application {
 
     public void scanNumbers() {
         dbHelper.scanTempNumbers();
-    }
-
-    public boolean saveSchedule(Schedule sch) {
-        return dbHelper.saveSchedule(sch);
     }
 
     public Schedule getScheduleById(int _id) {

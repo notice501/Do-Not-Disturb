@@ -38,27 +38,19 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class TimeDialogFragment extends DialogFragment implements TimeSelectView {
 
+    public static final int CHECKED = 0xFF0099CC;
+    public static final int UNCHECKED = 0xFFFFFFFF;
     @BindView(R.id.fromTime)
     TextView fromTime;
-
     @BindView(R.id.toTime)
     TextView toTime;
-
     @BindViews(value = {R.id.M, R.id.Tu, R.id.W, R.id.Th, R.id.F, R.id.Sa, R.id.Su})
     List<TextView> dayViews;
-
     @Inject
     TimePresenter timePresenter;
-
     @Nullable
     private Schedule schedule;
-
     private ButterKnife.Action<TextView> action;
-
-    private static final int CHECKED = 0xFF0099CC;
-
-    private static final int UNCHECKED = 0xFFFFFFFF;
-
     private CompositeSubscription subscriptions;
 
     @Nullable
@@ -100,7 +92,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
                         view.setTextColor(CHECKED);
                         break;
                 }
-                timePresenter.modifyCheckedDay(index, currentColor & (0xFF << 16));
+                timePresenter.modifyCheckedDay(index, currentColor & 1);
             });
             subscriptions.add(subscription);
             view.setTextColor(timePresenter.getCheckedDays().get(index) == 0 ? UNCHECKED : CHECKED);

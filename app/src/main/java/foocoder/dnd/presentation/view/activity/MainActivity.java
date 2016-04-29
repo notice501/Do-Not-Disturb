@@ -2,10 +2,9 @@ package foocoder.dnd.presentation.view.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
@@ -27,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 
@@ -47,6 +46,7 @@ import foocoder.dnd.presentation.internal.di.modules.ActivityModule;
 import foocoder.dnd.presentation.presenter.MainPresenter;
 import foocoder.dnd.presentation.view.MainSettingView;
 import foocoder.dnd.presentation.view.adapter.ScheduleAdapter;
+import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
 import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
@@ -106,11 +106,12 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @Inject
     MainPresenter mainPresenter;
 
+    @Inject
+    ScheduleAdapter adapter;
+
     private AudioManager audio;
 
     private List<Schedule> schList;
-
-    private ScheduleAdapter adapter;
 
     private TimeDialog addDialog;
 
@@ -120,15 +121,10 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     private boolean open_setting;
 
-    private int originBottom = 0;
-
-    private int originEnd = 0;
-
-    private int originalHeight = 0;
-
     private int heightToScale;
 
     private int heightToMove;
+
     private float translationY;
 
     @Override
@@ -150,12 +146,11 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
         timepicker.setVisibility(sp.isQuiet() ? View.VISIBLE : View.GONE);
 
-        adapter = new ScheduleAdapter(this, schList);
         schs.setAdapter(adapter);
         schs.setDivider(null);
+        mainPresenter.start();
 
         getWindow().getDecorView().post(() -> {
-            originalHeight = more_setting.getHeight();
             int[] points = new int[2];
             fab.getLocationOnScreen(points);
             translationY = container.getHeight() - TypedValue.applyDimension(COMPLEX_UNIT_DIP, 118, getResources().getDisplayMetrics());
@@ -276,61 +271,40 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     @OnItemClick(R.id.schs)
     void onScheduleListItemClick(AdapterView<?> parent, View view, int position, long id) {
-        itemDialog = new TimeDialog(schList.get(position), MainActivity.this, new TimeDialog.OnCustomDialogListener() {
-            @Override
-            public void back(Schedule sch) {
-                if (sch.isDel()) {
-                    AlarmUtil.cancelOldAlarm(MainActivity.this, sch);
-                    schList.remove(sch);
-                    global.delSchedule(sch);
-                    if (schList.size() == 0) {
-                        sp.setRunningId(-1);
-                    }
-                } else {
-                    schList.set(position, sch);
-                    global.updateSchedule(sch);
-                    if (!sp.isStarted()) {
-                        AlarmUtil.startSchedule(MainActivity.this, sch);
-                    }
+        itemDialog = new TimeDialog(schList.get(position), MainActivity.this, sch -> {
+            if (sch.isDel()) {
+                AlarmUtil.cancelOldAlarm(MainActivity.this, sch);
+                schList.remove(sch);
+                global.delSchedule(sch);
+                if (schList.size() == 0) {
+                    sp.setRunningId(-1);
                 }
-                adapter.notifyDataSetChanged();
+            } else {
+                schList.set(position, sch);
+                global.updateSchedule(sch);
+                if (!sp.isStarted()) {
+                    AlarmUtil.startSchedule(MainActivity.this, sch);
+                }
             }
+            adapter.notifyDataSetChanged();
         });
         itemDialog.show();
     }
 
     @OnClick(R.id.add)
     void onAddClick() {
-        addDialog = new TimeDialog(MainActivity.this, new TimeDialog.OnCustomDialogListener() {
-
-            @Override
-            public void back(Schedule sch) {
-                if (sch.isDel()) {
-                    schList.remove(sch);
-                    global.delSchedule(sch);
-                } else {
-                    if (schList.size() >= 5) {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                        alert.setTitle(getString(R.string.hint))
-                                .setMessage(R.string.hint_desc)
-                                .setPositiveButton(R.string.complete, (dialog, which) -> {
-                                    dialog.dismiss();
-                                }).create().show();
-                        return;
-                    }
-                    int _id = sp.getId() + 2;
-                    sch.setId(_id);
-                    sp.setId(_id);
-                    if (!sp.isStarted()) {
-                        AlarmUtil.startSchedule(MainActivity.this, sch);
-                    }
-                    schList.add(sch);
-                    global.saveSchedule(sch);
-                }
+        TimeDialogFragment dialogFragment = TimeDialogFragment.newInstance(null);
+        dialogFragment.setOnScheduleSetListener(schedule -> {
+            if (mainPresenter.getSchedules().size() >= 5) {
+                Toast.makeText(this, R.string.hint_desc, Toast.LENGTH_LONG).show();
+            } else {
+                mainPresenter.addSchedule(schedule);
                 adapter.notifyDataSetChanged();
             }
         });
-        addDialog.show();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.add(dialogFragment, "time");
+        transaction.commit();
     }
 
     @OnClick(R.id.big_fab)
@@ -373,8 +347,13 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         repeat_switch.setChecked(sp.isRepeated());
     }
 
+    @Override
+    public void showSchedules() {
+        adapter.notifyDataSetChanged();
+    }
+
     private void initAnim() {
-        final ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.3f)
+        ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.3f)
                 , PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.3f)
                 , PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 1f, heightToScale));
         scaleOpen.setDuration(220);
@@ -395,7 +374,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
             }
         });
 
-        final RotateAnimation rotateClose = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        RotateAnimation rotateClose = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         rotateClose.setDuration(335);
         rotateClose.setFillAfter(true);
 
@@ -412,8 +391,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         });
 
         Subscription subscription = RxView.clicks(up_fab).subscribe(aVoid -> {
-            originEnd = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).rightMargin;
-            originBottom = ((ViewGroup.MarginLayoutParams) up_fab.getLayoutParams()).bottomMargin;
             if (!open_setting) {
                 open_setting = true;
                 scaleOpen.setStartDelay(100);
@@ -426,12 +403,12 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         });
         addSubscriptionsForUnbinding(subscription);
 
-        LayoutTransition transition = new LayoutTransition();
-        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(schs, PropertyValuesHolder.ofFloat(View.SCALE_Y, 0, 1));
-        appear.setDuration(100);
-        appear.setInterpolator(new OvershootInterpolator());
-        transition.setAnimator(LayoutTransition.APPEARING, appear);
-        more_setting.setLayoutTransition(transition);
+//        LayoutTransition transition = new LayoutTransition();
+//        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(schs, PropertyValuesHolder.ofFloat(View.SCALE_Y, 0, 1));
+//        appear.setDuration(100);
+//        appear.setInterpolator(new OvershootInterpolator());
+//        transition.setAnimator(LayoutTransition.APPEARING, appear);
+//        more_setting.setLayoutTransition(transition);
     }
 
     private class MyListener implements SharedPreferences.OnSharedPreferenceChangeListener {

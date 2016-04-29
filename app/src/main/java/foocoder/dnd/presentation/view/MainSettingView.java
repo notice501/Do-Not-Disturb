@@ -18,4 +18,6 @@ public interface MainSettingView {
     void changeVibrationState(boolean enabled);
 
     void changeRepetitionState(boolean enabled);
+
+    void showSchedules();
 }

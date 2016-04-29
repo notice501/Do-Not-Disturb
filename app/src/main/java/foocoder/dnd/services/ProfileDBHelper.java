@@ -3,6 +3,7 @@ package foocoder.dnd.services;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -10,12 +11,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Singleton;
-
 import foocoder.dnd.domain.Contact;
 import foocoder.dnd.domain.Schedule;
 
-@Singleton
 public class ProfileDBHelper extends SQLiteOpenHelper {
 
     public static final String COLUMN_ID = "_id";
@@ -117,22 +115,30 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         c.close();
     }
 
-    public boolean saveSchedule(Schedule sch) {
+    public void saveSchedule(Schedule schedule) throws SQLException {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, sch.getId());
-        values.put(COLUMN_FROM, sch.getFrom());
-        values.put(COLUMN_TO, sch.getTo());
-        values.put(COLUMN_MON, sch.getChecked().get(0));
-        values.put(COLUMN_TUE, sch.getChecked().get(1));
-        values.put(COLUMN_WED, sch.getChecked().get(2));
-        values.put(COLUMN_THU, sch.getChecked().get(3));
-        values.put(COLUMN_FRI, sch.getChecked().get(4));
-        values.put(COLUMN_SAT, sch.getChecked().get(5));
-        values.put(COLUMN_SUN, sch.getChecked().get(6));
+        values.put(COLUMN_ID, schedule._id);
+        values.put(COLUMN_FROM, schedule.from);
+        values.put(COLUMN_TO, schedule.to);
+        values.put(COLUMN_MON, schedule.checked.get(0));
+        values.put(COLUMN_TUE, schedule.checked.get(1));
+        values.put(COLUMN_WED, schedule.checked.get(2));
+        values.put(COLUMN_THU, schedule.checked.get(3));
+        values.put(COLUMN_FRI, schedule.checked.get(4));
+        values.put(COLUMN_SAT, schedule.checked.get(5));
+        values.put(COLUMN_SUN, schedule.checked.get(6));
 
         long result = db.insert(TABLE_SCHEDULES, null, values);
-        return result > 0;
+        if (result < 0) {
+            throw new SQLException("save schedules failed");
+        }
+    }
+
+    public void saveSchedules(List<Schedule> schedules) throws SQLException {
+        for (Schedule schedule : schedules) {
+            saveSchedule(schedule);
+        }
     }
 
     public boolean updateSchedule(Schedule sch) {

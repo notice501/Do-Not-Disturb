@@ -1,6 +1,15 @@
 package foocoder.dnd.presentation.internal.di.modules;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dagger.Module;
+import dagger.Provides;
+import foocoder.dnd.domain.Schedule;
+import foocoder.dnd.domain.interactor.GetSchedules;
+import foocoder.dnd.domain.interactor.SaveSchedule;
+import foocoder.dnd.domain.interactor.ScheduleCase;
+import foocoder.dnd.presentation.internal.di.PerActivity;
 
 /**
  * Created by xuechi.
@@ -10,4 +19,21 @@ import dagger.Module;
 @Module
 public class MainModule {
 
+    @Provides
+    @PerActivity
+    List<Schedule> provideScheduleList() {
+        return new ArrayList<>();
+    }
+
+    @Provides
+    @PerActivity
+    ScheduleCase<Schedule> provideSaveScheduleCase(SaveSchedule saveSchedule) {
+        return saveSchedule;
+    }
+
+    @Provides
+    @PerActivity
+    ScheduleCase<List<Schedule>> provideGetSchedulesCase(GetSchedules getSchedules) {
+        return getSchedules;
+    }
 }

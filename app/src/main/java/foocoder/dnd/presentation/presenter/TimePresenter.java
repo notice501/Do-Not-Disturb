@@ -24,13 +24,13 @@ public class TimePresenter extends Presenter<TimeSelectView> {
     @Inject
     public TimePresenter() {
         checkedDays = new ArrayList<>(7);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
-//        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
+        checkedDays.add(0);
     }
 
     @Override
