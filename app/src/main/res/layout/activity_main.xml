@@ -3,13 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".presentation.view.activity.MainActivity"
     tools:ignore="ContentDescription">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:id="@+id/quick_start"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
 
@@ -17,7 +16,7 @@
             android:id="@+id/big_fab"
             android:layout_width="@dimen/fab_big_size"
             android:layout_height="@dimen/fab_big_size"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="89dp"
             android:background="@drawable/button"
             android:contentDescription="@string/quick_start"/>
@@ -26,7 +25,6 @@
             android:id="@+id/recover_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/big_fab"
             android:layout_marginTop="48dp"
             android:paddingLeft="28dp"
             android:paddingRight="28dp"
@@ -63,7 +61,6 @@
             android:id="@+id/setting_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/recover_rl"
             android:layout_marginTop="30dp"
             android:paddingLeft="28dp"
             android:paddingRight="28dp">
@@ -94,9 +91,12 @@
                 android:layout_toEndOf="@id/setting_title"
                 android:background="@android:color/transparent"/>
         </RelativeLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
     <include
         android:id="@+id/more_setting"
-        layout="@layout/more_settings"/>
+        layout="@layout/more_settings"
+        tools:layout_gravity="bottom"
+        tools:layout_width="match_parent"
+        tools:layout_height="118dp"/>
 </FrameLayout>

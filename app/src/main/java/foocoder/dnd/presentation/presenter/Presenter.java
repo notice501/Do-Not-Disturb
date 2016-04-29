@@ -1,5 +1,6 @@
 package foocoder.dnd.presentation.presenter;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -19,6 +20,7 @@ abstract class Presenter<VIEW> {
     @Nullable
     private VIEW view;
 
+    @CallSuper
     public void bindView(@NonNull VIEW view) {
         if (this.view != null) {
             throw new PreviousViewUnboundedException();
@@ -27,20 +29,21 @@ abstract class Presenter<VIEW> {
         this.view = view;
     }
 
+    @CallSuper
     public void unbind() {
         this.view = null;
 
         subscriptions.clear();
     }
 
-    protected void addSubscriptionsForUnbinding(Subscription... subscriptions) {
+    protected final void addSubscriptionsForUnbinding(Subscription... subscriptions) {
         for (Subscription subscription : subscriptions) {
             this.subscriptions.add(subscription);
         }
     }
 
     @Nullable
-    public VIEW getView() {
+    public final VIEW getView() {
         return this.view;
     }
 

@@ -206,7 +206,7 @@
             android:background="@android:color/darker_gray" />
 
         <Button
-            android:id="@+id/over"
+            android:id="@+id/ok"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

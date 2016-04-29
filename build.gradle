@@ -20,9 +20,13 @@ allprojects {
 }
 
 task clean(type: Delete) {
+    group 'build'
+    description 'Deletes the build directory'
     delete rootProject.buildDir
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+    group 'Help'
+    description 'Generates wrapper files'
+    gradleVersion = '2.13'
 }

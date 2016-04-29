@@ -1,11 +1,10 @@
 package foocoder.dnd.presentation;
 
 import android.app.Application;
-import android.content.Context;
 import android.database.Cursor;
 import android.provider.CallLog;
 
-import com.tencent.bugly.crashreport.CrashReport;
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.util.List;
 
@@ -30,8 +29,6 @@ public class App extends Application {
 
     private boolean _isUnavailable;
 
-    private int originalHeight = 0;
-
     public static final String START_STOP_ACTION = "foocoder.dnd.startstop";
 
     public static final String AUTO_TIME_SCHEDULE = "foocoder.dnd.auto";
@@ -50,13 +47,14 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        CrashReport.initCrashReport(this, "900021069", BuildConfig.DEBUG);
+//        CrashReport.initCrashReport(this, "900021069", BuildConfig.DEBUG);
 
         this.applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .build();
 
         this.applicationComponent.inject(this);
+        JodaTimeAndroid.init(this);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -68,7 +66,7 @@ public class App extends Application {
         _isUnavailable = false;
     }
 
-    public static Context getContext() {
+    public static App getContext() {
         return instance;
     }
 
@@ -86,15 +84,6 @@ public class App extends Application {
 
     public void set_isUnavailable(boolean _flag) {
         this._isUnavailable = _flag;
-    }
-
-
-    public int getOriginalHeight() {
-        return originalHeight;
-    }
-
-    public void setOriginalHeight(int originalHeight) {
-        this.originalHeight = originalHeight;
     }
 
     public boolean hasNumber(String number) {

@@ -1,24 +1,26 @@
 package foocoder.dnd.domain;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Schedule {
+public class Schedule implements Parcelable {
 
-    private int _id;
+    public int _id;
 
-    private String from;
+    public String from;
 
-    private String to;
+    public String to;
 
-    private List<Integer> checked;
+    public List<Integer> checked;
 
-    private boolean del;
+    public boolean del;
 
-    private boolean running;
+    public boolean running;
 
-    public Schedule() {
-
-    }
+    public Schedule() {}
 
     public Schedule(String from, String to, List<Integer> checked) {
         this.from = from;
@@ -68,11 +70,40 @@ public class Schedule {
         this._id = _id;
     }
 
-    public boolean isRunning() {
-        return running;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setRunning(boolean running) {
-        this.running = running;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this._id);
+        dest.writeString(this.from);
+        dest.writeString(this.to);
+        dest.writeList(this.checked);
+        dest.writeByte(del ? (byte) 1 : (byte) 0);
+        dest.writeByte(running ? (byte) 1 : (byte) 0);
     }
+
+    protected Schedule(Parcel in) {
+        this._id = in.readInt();
+        this.from = in.readString();
+        this.to = in.readString();
+        this.checked = new ArrayList<>();
+        in.readList(this.checked, Integer.class.getClassLoader());
+        this.del = in.readByte() != 0;
+        this.running = in.readByte() != 0;
+    }
+
+    public static final Creator<Schedule> CREATOR = new Creator<Schedule>() {
+        @Override
+        public Schedule createFromParcel(Parcel source) {
+            return new Schedule(source);
+        }
+
+        @Override
+        public Schedule[] newArray(int size) {
+            return new Schedule[size];
+        }
+    };
 }

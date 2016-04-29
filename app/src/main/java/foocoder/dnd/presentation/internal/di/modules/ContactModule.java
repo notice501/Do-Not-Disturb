@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Named;
@@ -37,7 +38,7 @@ public class ContactModule {
 
     @Provides
     List<Contact> provideContacts() {
-        return new ArrayList<>();
+        return new CopyOnWriteArrayList<>();
     }
 
     @Named("selected")
