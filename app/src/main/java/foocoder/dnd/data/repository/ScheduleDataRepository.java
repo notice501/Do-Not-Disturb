@@ -63,14 +63,17 @@ public class ScheduleDataRepository implements ScheduleRepository {
     }
 
     @Override
-    public Observable saveSchedule(Schedule schedule) {
-        return Observable.create(subscriber -> {
-            try {
-                dbHelper.saveSchedule(schedule);
-                subscriber.onCompleted();
-            } catch (Exception e) {
-                subscriber.onError(e);
-            }
-        });
+    public Observable<Boolean> saveSchedule(Schedule schedule) {
+        return Observable.fromCallable(() -> dbHelper.saveSchedule(schedule));
+    }
+
+    @Override
+    public Observable<Boolean> updateSchedule(Schedule schedule) {
+        return Observable.fromCallable(() -> dbHelper.updateSchedule(schedule));
+    }
+
+    @Override
+    public Observable<Boolean> deleteSchedule(Schedule schedule) {
+        return Observable.fromCallable(() -> dbHelper.delSchedule(schedule));
     }
 }

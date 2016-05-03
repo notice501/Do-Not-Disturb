@@ -12,7 +12,7 @@ import rx.Observable;
  * Time: 2016 四月 30 03:30
  * Project: dnd
  */
-public class SaveSchedule extends ScheduleCase<Schedule> {
+public class SaveSchedule extends ScheduleCase<Boolean> {
 
     private List<Schedule> scheduleList;
 
@@ -22,7 +22,7 @@ public class SaveSchedule extends ScheduleCase<Schedule> {
     }
 
     @Override
-    protected Observable<Schedule> buildContactCaseObservable() {
-        return this.scheduleRepository.saveSchedule(scheduleList.get(scheduleList.size() -1));
+    protected Observable<Boolean> buildContactCaseObservable() {
+        return this.scheduleRepository.saveSchedule(scheduleList.get(scheduleList.size() - 1));
     }
 }

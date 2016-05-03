@@ -8,7 +8,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-@SuppressWarnings("all")
+@SuppressWarnings("unchecked")
 public abstract class ContactCase {
 
     ContactCase() {}
@@ -22,14 +22,9 @@ public abstract class ContactCase {
 
     protected abstract Observable buildContactCaseObservable();
 
-    private Observable.Transformer getTransformer() {
-        return new Observable.Transformer() {
-            @Override
-            public Object call(Object o) {
-                return ((Observable) o)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        };
+    private Observable.Transformer<?, ?> getTransformer() {
+        return objectObservable -> objectObservable
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread());
     }
 }

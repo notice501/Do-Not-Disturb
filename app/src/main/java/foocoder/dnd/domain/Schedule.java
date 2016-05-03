@@ -8,16 +8,22 @@ import java.util.List;
 
 public class Schedule implements Parcelable {
 
+    public static final Creator<Schedule> CREATOR = new Creator<Schedule>() {
+        @Override
+        public Schedule createFromParcel(Parcel source) {
+            return new Schedule(source);
+        }
+
+        @Override
+        public Schedule[] newArray(int size) {
+            return new Schedule[size];
+        }
+    };
     public int _id;
-
     public String from;
-
     public String to;
-
     public List<Integer> checked;
-
     public boolean del;
-
     public boolean running;
 
     public Schedule() {}
@@ -28,6 +34,16 @@ public class Schedule implements Parcelable {
         this.checked = checked;
         this.del = false;
         this.running = false;
+    }
+
+    protected Schedule(Parcel in) {
+        this._id = in.readInt();
+        this.from = in.readString();
+        this.to = in.readString();
+        this.checked = new ArrayList<>();
+        in.readList(this.checked, Integer.class.getClassLoader());
+        this.del = in.readByte() != 0;
+        this.running = in.readByte() != 0;
     }
 
     public String getFrom() {
@@ -85,25 +101,10 @@ public class Schedule implements Parcelable {
         dest.writeByte(running ? (byte) 1 : (byte) 0);
     }
 
-    protected Schedule(Parcel in) {
-        this._id = in.readInt();
-        this.from = in.readString();
-        this.to = in.readString();
-        this.checked = new ArrayList<>();
-        in.readList(this.checked, Integer.class.getClassLoader());
-        this.del = in.readByte() != 0;
-        this.running = in.readByte() != 0;
+    public void copy(Schedule schedule) {
+        this._id = schedule._id;
+        this.from = schedule.from;
+        this.to = schedule.to;
+        this.checked = schedule.checked;
     }
-
-    public static final Creator<Schedule> CREATOR = new Creator<Schedule>() {
-        @Override
-        public Schedule createFromParcel(Parcel source) {
-            return new Schedule(source);
-        }
-
-        @Override
-        public Schedule[] newArray(int size) {
-            return new Schedule[size];
-        }
-    };
 }

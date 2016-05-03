@@ -29,8 +29,6 @@ import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -50,7 +48,6 @@ import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
 import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
-import foocoder.dnd.views.TimeDialog;
 import rx.Subscription;
 
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
@@ -111,12 +108,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     private AudioManager audio;
 
-    private List<Schedule> schList;
-
-    private TimeDialog addDialog;
-
-    private TimeDialog itemDialog;
-
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     private boolean open_setting;
@@ -141,8 +132,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
         sp.registerListener(listener);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        schList = global.getScheduleList();
 
         timepicker.setVisibility(sp.isQuiet() ? View.VISIBLE : View.GONE);
 
@@ -271,24 +260,20 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     @OnItemClick(R.id.schs)
     void onScheduleListItemClick(AdapterView<?> parent, View view, int position, long id) {
-        itemDialog = new TimeDialog(schList.get(position), MainActivity.this, sch -> {
-            if (sch.isDel()) {
-                AlarmUtil.cancelOldAlarm(MainActivity.this, sch);
-                schList.remove(sch);
-                global.delSchedule(sch);
-                if (schList.size() == 0) {
-                    sp.setRunningId(-1);
-                }
+        TimeDialogFragment dialogFragment = TimeDialogFragment.newInstance(
+                mainPresenter.getSchedule(position));
+        dialogFragment.setOnScheduleSetListener(schedule -> {
+            if (schedule.del) {
+                AlarmUtil.cancelOldAlarm(this, schedule);
+                mainPresenter.deleteSchedule(schedule);
             } else {
-                schList.set(position, sch);
-                global.updateSchedule(sch);
-                if (!sp.isStarted()) {
-                    AlarmUtil.startSchedule(MainActivity.this, sch);
-                }
+                mainPresenter.updateSchedule(schedule, position);
             }
-            adapter.notifyDataSetChanged();
+            showSchedules();
         });
-        itemDialog.show();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.add(dialogFragment, "time");
+        transaction.commit();
     }
 
     @OnClick(R.id.add)

@@ -115,7 +115,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         c.close();
     }
 
-    public void saveSchedule(Schedule schedule) throws SQLException {
+    public boolean saveSchedule(Schedule schedule) throws SQLException {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, schedule._id);
@@ -130,9 +130,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_SUN, schedule.checked.get(6));
 
         long result = db.insert(TABLE_SCHEDULES, null, values);
-        if (result < 0) {
-            throw new SQLException("save schedules failed");
-        }
+        return result >= 0;
     }
 
     public void saveSchedules(List<Schedule> schedules) throws SQLException {
@@ -144,18 +142,18 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
     public boolean updateSchedule(Schedule sch) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ID, sch.getId());
-        values.put(COLUMN_FROM, sch.getFrom());
-        values.put(COLUMN_TO, sch.getTo());
-        values.put(COLUMN_MON, sch.getChecked().get(0));
-        values.put(COLUMN_TUE, sch.getChecked().get(1));
-        values.put(COLUMN_WED, sch.getChecked().get(2));
-        values.put(COLUMN_THU, sch.getChecked().get(3));
-        values.put(COLUMN_FRI, sch.getChecked().get(4));
-        values.put(COLUMN_SAT, sch.getChecked().get(5));
-        values.put(COLUMN_SUN, sch.getChecked().get(6));
+        values.put(COLUMN_ID, sch._id);
+        values.put(COLUMN_FROM, sch.from);
+        values.put(COLUMN_TO, sch.to);
+        values.put(COLUMN_MON, sch.checked.get(0));
+        values.put(COLUMN_TUE, sch.checked.get(1));
+        values.put(COLUMN_WED, sch.checked.get(2));
+        values.put(COLUMN_THU, sch.checked.get(3));
+        values.put(COLUMN_FRI, sch.checked.get(4));
+        values.put(COLUMN_SAT, sch.checked.get(5));
+        values.put(COLUMN_SUN, sch.checked.get(6));
 
-        int result = db.update(TABLE_SCHEDULES, values, COLUMN_ID + "=?", new String[]{sch.getId() + ""});
+        int result = db.update(TABLE_SCHEDULES, values, COLUMN_ID + "=?", new String[]{sch._id + ""});
         return result > 0;
     }
 
@@ -168,15 +166,19 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
     public List<Schedule> getScheduleList() {
         SQLiteDatabase db = this.getReadableDatabase();
-        List<Schedule> schs = new ArrayList<Schedule>(7);
+        List<Schedule> schedules = new ArrayList<>(7);
 
         Cursor c = db.query(TABLE_SCHEDULES, null, null, null, null, null, null, null);
+        if (c == null) {
+            return schedules;
+        }
+
         while (c.moveToNext()) {
-            Schedule sch = new Schedule();
+            Schedule schedule = new Schedule();
             List<Integer> checked = new ArrayList<Integer>();
-            sch.setId(c.getInt(0));
-            sch.setFrom(c.getString(1));
-            sch.setTo(c.getString(2));
+            schedule._id= c.getInt(0);
+            schedule.from = c.getString(1);
+            schedule.to = c.getString(2);
 
             checked.add(c.getInt(3));
             checked.add(c.getInt(4));
@@ -185,14 +187,14 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
             checked.add(c.getInt(7));
             checked.add(c.getInt(8));
             checked.add(c.getInt(9));
-            sch.setChecked(checked);
+            schedule.setChecked(checked);
 
-            schs.add(sch);
+            schedules.add(schedule);
         }
 
         c.close();
 
-        return schs;
+        return schedules;
     }
 
     public Schedule getSchedule(int _id) {

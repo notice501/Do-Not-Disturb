@@ -3,6 +3,8 @@ package foocoder.dnd.presentation.view.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -18,6 +20,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 import foocoder.dnd.R;
 import foocoder.dnd.domain.Contact;
 import foocoder.dnd.presentation.internal.di.components.ContactComponent;
@@ -33,8 +36,6 @@ import timber.log.Timber;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public final class ContactListActivity extends BaseActivity<ContactComponent> implements ContactListView {
-
-    public static final int RESULT_FINISH = 999;
 
     @BindView(R.id.contacts)
     ListView listView;
@@ -57,6 +58,11 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
     @Inject
     ContactListPresenter presenter;
 
+    public static void start(Activity activity) {
+        Intent intent = new Intent(activity, ContactListActivity.class);
+        activity.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +73,6 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
         presenter.bindView(this);
 
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            CheckBox check = (CheckBox) view.findViewById(R.id.check);
-            check.toggle();
-            presenter.onContactCheckedChange(check.isChecked(), position);
-        });
 
         Subscription subscription = RxTextView.textChanges(search)
                 .skip(1)
@@ -86,7 +87,7 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
                     }
 
                     subscriber.onNext(charSequence);
-                }).subscribeOn(Schedulers.newThread()))
+                }).subscribeOn(Schedulers.computation()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn(throwable -> "An error occurred")
                 .subscribe(charSequence -> {
@@ -100,7 +101,6 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
     }
 
     @OnClick(R.id.save)
-    @SuppressWarnings("unused")
     void onSaveClick() {
         presenter.saveContactList();
 
@@ -108,9 +108,15 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
     }
 
     @OnClick(R.id.cancel)
-    @SuppressWarnings("unused")
     void onCancelClick() {
         finish();
+    }
+
+    @OnItemClick(R.id.contacts)
+    void onContactListItemClick(AdapterView<?> parent, View view, int position, long id) {
+        CheckBox check = (CheckBox) view.findViewById(R.id.check);
+        check.toggle();
+        presenter.onContactCheckedChange(check.isChecked(), position);
     }
 
     @Override
@@ -140,10 +146,5 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
 
     protected ContactComponent getComponent() {
         return getApplicationComponent().plus(getActivityModule());
-    }
-
-    public static void start(Activity activity) {
-        Intent intent = new Intent(activity, ContactListActivity.class);
-        activity.startActivity(intent);
     }
 }

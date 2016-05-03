@@ -39,18 +39,26 @@ import rx.subscriptions.CompositeSubscription;
 public class TimeDialogFragment extends DialogFragment implements TimeSelectView {
 
     public static final int CHECKED = 0xFF0099CC;
+
     public static final int UNCHECKED = 0xFFFFFFFF;
+
     @BindView(R.id.fromTime)
     TextView fromTime;
+
     @BindView(R.id.toTime)
     TextView toTime;
+
     @BindViews(value = {R.id.M, R.id.Tu, R.id.W, R.id.Th, R.id.F, R.id.Sa, R.id.Su})
     List<TextView> dayViews;
+
     @Inject
     TimePresenter timePresenter;
     @Nullable
+
     private Schedule schedule;
+
     private ButterKnife.Action<TextView> action;
+
     private CompositeSubscription subscriptions;
 
     @Nullable
@@ -58,7 +66,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
 
     private TimePickerDialog timePicker;
 
-    private DateTime dateTime;
+    private DateTime dateTime = DateTime.now();
 
     public static TimeDialogFragment newInstance(@Nullable Schedule schedule) {
         Bundle args = new Bundle();
@@ -80,6 +88,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
         super.onCreate(savedInstanceState);
 
         App.getContext().getApplicationComponent().inject(this);
+
         subscriptions = new CompositeSubscription();
         action = (view, index) -> {
             Subscription subscription = RxView.clicks(view).subscribe(aVoid -> {
@@ -97,7 +106,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
             subscriptions.add(subscription);
             view.setTextColor(timePresenter.getCheckedDays().get(index) == 0 ? UNCHECKED : CHECKED);
         };
-        dateTime = DateTime.now();
+        timePresenter.setSchedule(schedule);
     }
 
     @Nullable
@@ -114,7 +123,6 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
         timePresenter.bindView(this);
 
         if (schedule != null) {
-            timePresenter.setSchedule(schedule);
             fromTime.setText(schedule.getFrom());
             toTime.setText(schedule.getTo());
         }
@@ -152,6 +160,14 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
 
     @OnClick(R.id.ok)
     void onOkClick() {
+        if(schedule == null){
+            schedule = new Schedule(fromTime.getText().toString(),
+                    toTime.getText().toString(), timePresenter.getCheckedDays());
+        } else {
+            schedule.from = fromTime.getText().toString();
+            schedule.to = toTime.getText().toString();
+            schedule.checked = timePresenter.getCheckedDays();
+        }
         if (listener != null) {
             listener.call(timePresenter.modifySchedule(
                     fromTime.getText().toString(), toTime.getText().toString()));

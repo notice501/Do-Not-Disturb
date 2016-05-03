@@ -77,6 +77,7 @@ public class ScheduleAdapter extends BaseAdapter {
 
         @BindView(R.id.time_show)
         public TextView times;
+
         @BindViews(value = {R.id.M, R.id.Tu, R.id.W, R.id.Th, R.id.F, R.id.Sa, R.id.Su})
         List<TextView> dayViews;
     }

@@ -1,7 +1,6 @@
 package foocoder.dnd.data.repository;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -23,17 +22,14 @@ import rx.Observable;
 @Singleton
 public class ContactDataRepository implements ContactRepository {
 
-    private final ProfileDBHelper helper;
-
-    private Context context;
-
-    private TypedArray colors;
-
     private static final String[] PROJECTION = new String[]{
             Phone.CONTACT_ID,
             Phone.DISPLAY_NAME,
             Phone.NUMBER,
             Phone.MIMETYPE};
+    private ProfileDBHelper helper;
+    private Application context;
+    private TypedArray colors;
 
     @Inject
     public ContactDataRepository(ProfileDBHelper helper, Application context) {
