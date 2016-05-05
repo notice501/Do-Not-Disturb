@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
@@ -38,10 +37,8 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "profiles.db";
 
-    public ProfileDBHelper(Context context, String name, CursorFactory factory,
-                           int version) {
-
-        super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+    public ProfileDBHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -157,16 +154,16 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         return result > 0;
     }
 
-    public boolean delSchedule(Schedule sch) {
+    public boolean delSchedule(Schedule schedule) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        int result = db.delete(TABLE_SCHEDULES, COLUMN_ID + "=?", new String[]{sch.getId() + ""});
+        int result = db.delete(TABLE_SCHEDULES, COLUMN_ID + "=?", new String[]{String.valueOf(schedule._id)});
         return result > 0;
     }
 
     public List<Schedule> getScheduleList() {
         SQLiteDatabase db = this.getReadableDatabase();
-        List<Schedule> schedules = new ArrayList<>(7);
+        List<Schedule> schedules = new ArrayList<>();
 
         Cursor c = db.query(TABLE_SCHEDULES, null, null, null, null, null, null, null);
         if (c == null) {
@@ -175,7 +172,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
         while (c.moveToNext()) {
             Schedule schedule = new Schedule();
-            List<Integer> checked = new ArrayList<Integer>();
+            List<Integer> checked = new ArrayList<>();
             schedule._id= c.getInt(0);
             schedule.from = c.getString(1);
             schedule.to = c.getString(2);
@@ -294,9 +291,10 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         return contacts;
     }
 
-    public void clearContacts() {
+    public boolean clearContacts() {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.delete(TABLE_CONTACTS, null, null);
+        int result = db.delete(TABLE_CONTACTS, null, null);
+        return result > 0;
     }
 }

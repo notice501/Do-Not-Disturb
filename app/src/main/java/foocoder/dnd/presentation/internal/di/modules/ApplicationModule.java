@@ -38,7 +38,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     ProfileDBHelper provideProfileDBHelper() {
-        return new ProfileDBHelper(app, null, null, 1);
+        return new ProfileDBHelper(app);
     }
 
     @Provides

@@ -19,7 +19,7 @@ public class DeveloperModule {
     @NonNull
     @Provides
     @Singleton
-    DeveloperSettings provideDeveloperSettings(Application application) {
+    protected DeveloperSettings provideDeveloperSettings(Application application) {
         return new DeveloperSettings(application);
     }
 }
