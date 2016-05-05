@@ -11,4 +11,10 @@ import foocoder.dnd.presentation.view.activity.ContactListActivity;
 public interface ContactComponent extends ActivityComponent {
 
     void inject(ContactListActivity activity);
+
+    @Subcomponent.Builder
+    interface Builder {
+        Builder activityModule(ActivityModule activityModule);
+        ContactComponent build();
+    }
 }

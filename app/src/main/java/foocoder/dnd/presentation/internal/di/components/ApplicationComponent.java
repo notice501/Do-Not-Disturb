@@ -17,7 +17,7 @@ public interface ApplicationComponent {
 
     void inject(TimeDialogFragment fragment);
 
-    ContactComponent plus(ActivityModule activityModule);
+    ContactComponent.Builder contactComponentBuilder();
 
     MainComponent add(ActivityModule activityModule);
 }

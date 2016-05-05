@@ -29,8 +29,6 @@ import foocoder.dnd.presentation.view.ContactListView;
 import foocoder.dnd.presentation.view.adapter.ContactAdapter;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -77,21 +75,19 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
         Subscription subscription = RxTextView.textChanges(search)
                 .skip(1)
                 .debounce(100, MILLISECONDS)
-                .switchMap(charSequence -> Observable.create(subscriber -> {
-                    final String name = charSequence.toString().toLowerCase();
-
+                .map(CharSequence::toString)
+                .<String>switchMap(s -> Observable.create(subscriber -> {
                     try {
-                        presenter.onTextChanged(name);
+                        presenter.onTextChanged(s.toLowerCase());
                     } catch (Exception e) {
                         subscriber.onError(e);
                     }
 
-                    subscriber.onNext(charSequence);
-                }).subscribeOn(Schedulers.computation()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .onErrorReturn(throwable -> "An error occurred")
-                .subscribe(charSequence -> {
-                    Timber.d("name to be searched %s", charSequence);
+                    subscriber.onNext(s);
+                }))
+                .onErrorReturn(throwable -> "An error occurred!")
+                .subscribe(s -> {
+                    Timber.d("name to be searched %s", s);
                     adapter.notifyDataSetChanged();
                 });
 
@@ -145,6 +141,9 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
     }
 
     protected ContactComponent getComponent() {
-        return getApplicationComponent().plus(getActivityModule());
+        return getApplicationComponent()
+                .contactComponentBuilder()
+                .activityModule(getActivityModule())
+                .build();
     }
 }
