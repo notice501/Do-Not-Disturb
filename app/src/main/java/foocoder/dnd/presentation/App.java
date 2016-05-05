@@ -46,9 +46,7 @@ public class App extends Application {
         super.onCreate();
 //        CrashReport.initCrashReport(this, "900021069", BuildConfig.DEBUG);
 
-        this.applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
-                .build();
+        this.applicationComponent = provideApplicationComponent();
 
         this.applicationComponent.inject(this);
         JodaTimeAndroid.init(this);
@@ -65,6 +63,12 @@ public class App extends Application {
 
     public ApplicationComponent getApplicationComponent() {
         return applicationComponent;
+    }
+
+    protected ApplicationComponent provideApplicationComponent() {
+        return DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .build();
     }
 
     public synchronized SharedPreferenceUtil getSharedPreferenceUtil() {
