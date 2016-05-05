@@ -160,14 +160,6 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
 
     @OnClick(R.id.ok)
     void onOkClick() {
-        if(schedule == null){
-            schedule = new Schedule(fromTime.getText().toString(),
-                    toTime.getText().toString(), timePresenter.getCheckedDays());
-        } else {
-            schedule.from = fromTime.getText().toString();
-            schedule.to = toTime.getText().toString();
-            schedule.checked = timePresenter.getCheckedDays();
-        }
         if (listener != null) {
             listener.call(timePresenter.modifySchedule(
                     fromTime.getText().toString(), toTime.getText().toString()));

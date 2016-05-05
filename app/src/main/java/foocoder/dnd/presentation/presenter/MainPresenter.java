@@ -82,8 +82,7 @@ public class MainPresenter extends Presenter<MainSettingView> {
 
     public void addSchedule(Schedule schedule) {
         int _id = spUtil.getId() + 2;
-        schedule._id = _id;
-        spUtil.setId(_id);
+        spUtil.setId(schedule._id = _id);
         if (!spUtil.isStarted()) {
             AlarmUtil.startSchedule(App.getContext(), schedule);
         }

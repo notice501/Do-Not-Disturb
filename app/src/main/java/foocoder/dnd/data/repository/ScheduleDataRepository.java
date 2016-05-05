@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import foocoder.dnd.data.exception.TimeNotSetException;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.repository.ScheduleRepository;
 import foocoder.dnd.services.ProfileDBHelper;
@@ -47,29 +48,43 @@ public class ScheduleDataRepository implements ScheduleRepository {
 
     @Override
     public Observable<Schedule> schedule(int _id) {
-        return null;
+        return Observable.fromCallable(() -> dbHelper.getSchedule(_id));
     }
 
     @Override
-    public Observable saveSchedules(List<Schedule> schedules) {
-        return Observable.create(subscriber -> {
-            try {
-                dbHelper.saveSchedules(schedules);
-                subscriber.onCompleted();
-            } catch (Exception e) {
-                subscriber.onError(e);
-            }
-        });
+    public Observable<Boolean> saveSchedules(List<Schedule> schedules) {
+        return Observable.from(schedules)
+                .map(schedule -> {
+                    if (schedule.from == null || schedule.to == null) {
+                        throw new TimeNotSetException();
+                    }
+
+                    return dbHelper.saveSchedule(schedule);
+                });
     }
 
     @Override
     public Observable<Boolean> saveSchedule(Schedule schedule) {
-        return Observable.fromCallable(() -> dbHelper.saveSchedule(schedule));
+        return Observable.<Boolean>create(subscriber -> {
+            if (schedule.from == null || schedule.to == null) {
+                throw new TimeNotSetException();
+            }
+
+            subscriber.onNext(dbHelper.saveSchedule(schedule));
+            subscriber.onCompleted();
+        });
     }
 
     @Override
     public Observable<Boolean> updateSchedule(Schedule schedule) {
-        return Observable.fromCallable(() -> dbHelper.updateSchedule(schedule));
+        return Observable.<Boolean>create(subscriber -> {
+            if (schedule.from == null || schedule.to == null) {
+                throw new TimeNotSetException();
+            }
+
+            subscriber.onNext(dbHelper.updateSchedule(schedule));
+            subscriber.onCompleted();
+        });
     }
 
     @Override

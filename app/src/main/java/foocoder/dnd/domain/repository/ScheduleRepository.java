@@ -15,7 +15,7 @@ public interface ScheduleRepository {
 
     Observable<Schedule> schedule(int _id);
 
-    Observable saveSchedules(List<Schedule> schedules);
+    Observable<Boolean> saveSchedules(List<Schedule> schedules);
 
     Observable<Boolean> saveSchedule(Schedule schedule);
 

@@ -53,9 +53,9 @@ public class TimePresenter extends Presenter<TimeSelectView> {
         if(schedule == null){
             schedule = new Schedule(from, to, checkedDays);
         } else {
-            schedule.setFrom(from);
-            schedule.setTo(to);
-            schedule.setChecked(checkedDays);
+            schedule.from = from;
+            schedule.to = to;
+            schedule.checked = checkedDays;
         }
         return schedule;
     }
