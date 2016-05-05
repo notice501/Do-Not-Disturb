@@ -13,8 +13,10 @@ import foocoder.dnd.services.ProfileDBHelper;
 import rx.observers.TestSubscriber;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -63,12 +65,25 @@ public class ScheduleDataRepositoryTest {
     @Test
     public void testSaveSchedules() throws Exception {
         List<Schedule> schedules = new ArrayList<>();
+        schedules.add(new Schedule("12:00", "13:00", new ArrayList<>()));
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         scheduleDataRepository.saveSchedules(schedules).subscribe(testSubscriber);
 
-        verify(profileDBHelper).saveSchedules(schedules);
-        testSubscriber.assertValueCount(0);
+        verify(profileDBHelper).saveSchedule(any(Schedule.class));
+        testSubscriber.assertValueCount(1);
         testSubscriber.assertCompleted();
+    }
+
+    @Test
+    public void saveSomeSchedulesWithNullTime() {
+        List<Schedule> schedules = new ArrayList<>();
+        schedules.add(new Schedule());
+        schedules.add(new Schedule());
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
+        scheduleDataRepository.saveSchedules(schedules).subscribe(testSubscriber);
+
+        verify(profileDBHelper, never()).saveSchedule(any(Schedule.class));
+        testSubscriber.assertError(TimeNotSetException.class);
     }
 
     @Test
@@ -117,6 +132,7 @@ public class ScheduleDataRepositoryTest {
 
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
         scheduleDataRepository.saveSchedule(schedule).subscribe(testSubscriber);
+        verify(profileDBHelper, never()).saveSchedule(any(Schedule.class));
         testSubscriber.assertError(TimeNotSetException.class);
     }
 }
