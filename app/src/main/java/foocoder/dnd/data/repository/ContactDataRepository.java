@@ -1,8 +1,8 @@
 package foocoder.dnd.data.repository;
 
 import android.app.Application;
-import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 
@@ -29,13 +29,13 @@ public class ContactDataRepository implements ContactRepository {
             Phone.MIMETYPE};
     private ProfileDBHelper helper;
     private Application context;
-    private TypedArray colors;
+    private String[] colors;
 
     @Inject
     public ContactDataRepository(ProfileDBHelper helper, Application context) {
         this.helper = helper;
         this.context = context;
-        this.colors = context.getResources().obtainTypedArray(R.array.colors);
+        this.colors = context.getResources().getStringArray(R.array.colors);
     }
 
     @Override
@@ -68,7 +68,8 @@ public class ContactDataRepository implements ContactRepository {
                     String phoneNo = cursor.getString(2);
 
                     contact = new Contact(id, name, phoneNo);
-                    int color = colors.getColor(index % 5, context.getResources().getColor(R.color.switch_color));
+//                    int color = colors.getColor(index % 5, context.getResources().getColor(R.color.switch_color));
+                    int color = Color.parseColor(colors[index % 5]);
                     if (lastColor == 0) {
                         contact.color = color;
                     } else {
