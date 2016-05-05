@@ -45,7 +45,6 @@ import foocoder.dnd.presentation.presenter.MainPresenter;
 import foocoder.dnd.presentation.view.MainSettingView;
 import foocoder.dnd.presentation.view.adapter.ScheduleAdapter;
 import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
-import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 import rx.Subscription;
@@ -67,8 +66,8 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @BindView(R.id.big_fab)
     ImageButton fab;
 
-    @BindView(R.id.recover_swh)
-    Switch recover_swh;
+//    @BindView(R.id.recover_swh)
+//    Switch recover_swh;
 
     @BindView(R.id.launch)
     Switch launch;
@@ -163,17 +162,17 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         super.onDestroy();
     }
 
-    @OnCheckedChanged(R.id.recover_swh)
-    void onRecoverSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
-        sp.setRecover(isChecked);
-
-        if (sp.isStarted()) {
-            if (isChecked) {
-                startService(new Intent(MainActivity.this, ListenerService.class).putExtra("note", getString(R.string.manual_auto_cancel)));
-            }
-
-        }
-    }
+//    @OnCheckedChanged(R.id.recover_swh)
+//    void onRecoverSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
+//        sp.setRecover(isChecked);
+//
+//        if (sp.isStarted()) {
+//            if (isChecked) {
+//                startService(new Intent(MainActivity.this, ListenerService.class).putExtra("note", getString(R.string.manual_auto_cancel)));
+//            }
+//
+//        }
+//    }
 
     @OnCheckedChanged(R.id.launch)
     void onLaunchSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
@@ -309,7 +308,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     @Override
     public void changeAutoRecoverState(boolean enabled) {
-        recover_swh.setChecked(sp.isRecoverable());
+//        recover_swh.setChecked(sp.isRecoverable());
     }
 
     @Override

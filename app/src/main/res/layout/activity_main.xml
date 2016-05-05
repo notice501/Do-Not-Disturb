@@ -6,10 +6,10 @@
     tools:ignore="ContentDescription">
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/quick_start"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:visibility="visible">
 
         <ImageButton
@@ -21,41 +21,41 @@
             android:background="@drawable/button"
             android:contentDescription="@string/quick_start"/>
 
-        <RelativeLayout
-            android:id="@+id/recover_rl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:paddingLeft="28dp"
-            android:paddingRight="28dp"
-            android:visibility="visible">
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/recover_rl"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="48dp"-->
+            <!--android:paddingLeft="28dp"-->
+            <!--android:paddingRight="28dp"-->
+            <!--android:visibility="visible">-->
 
-            <TextView
-                android:id="@+id/recover_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/auto_recover"
-                android:textColor="#ffffff"
-                android:textSize="17sp"/>
+            <!--<TextView-->
+                <!--android:id="@+id/recover_title"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/auto_recover"-->
+                <!--android:textColor="#ffffff"-->
+                <!--android:textSize="17sp"/>-->
 
-            <TextView
-                android:id="@+id/recover_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/recover_title"
-                android:layout_marginTop="3dp"
-                android:text="@string/auto_recover_explain"
-                android:textSize="15sp"/>
+            <!--<TextView-->
+                <!--android:id="@+id/recover_content"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/recover_title"-->
+                <!--android:layout_marginTop="3dp"-->
+                <!--android:text="@string/auto_recover_explain"-->
+                <!--android:textSize="15sp"/>-->
 
-            <Switch
-                android:id="@+id/recover_swh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/recover_title"
-                android:background="#00000000"/>
-        </RelativeLayout>
+            <!--<Switch-->
+                <!--android:id="@+id/recover_swh"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_toEndOf="@id/recover_title"-->
+                <!--android:background="#00000000"/>-->
+        <!--</RelativeLayout>-->
 
         <RelativeLayout
             android:id="@+id/setting_rl"
@@ -97,6 +97,6 @@
         android:id="@+id/more_setting"
         layout="@layout/more_settings"
         tools:layout_gravity="bottom"
-        tools:layout_width="match_parent"
-        tools:layout_height="118dp"/>
+        tools:layout_height="118dp"
+        tools:layout_width="match_parent"/>
 </FrameLayout>

@@ -3,6 +3,8 @@ package foocoder.dnd.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import foocoder.dnd.utils.rxpreference.RxPreference;
+
 public class SharedPreferenceUtil {
 
     public static final String MAX_ID = "max_id";
@@ -38,6 +40,8 @@ public class SharedPreferenceUtil {
 
     private SharedPreferences.Editor editor;
 
+    private RxPreference rxPreference;
+
     public SharedPreferenceUtil(Context context) {
         sp = context.getSharedPreferences("preferences", Context.MODE_PRIVATE);
         editor = sp.edit();
@@ -55,13 +59,13 @@ public class SharedPreferenceUtil {
         }
     }
 
+    public int getId() {
+        return sp.getInt(MAX_ID,0);
+    }
+
     public void setId(int id) {
         editor.putInt(MAX_ID,id);
         editor.commit();
-    }
-
-    public int getId() {
-        return sp.getInt(MAX_ID,0);
     }
 
     public void start(boolean isStarted) {
@@ -109,13 +113,13 @@ public class SharedPreferenceUtil {
         editor.commit();
     }
 
+    public boolean isQuiet(){
+        return sp.getBoolean(QUIET,false);
+    }
+
     public void setQuiet(boolean isQuiet){
         editor.putBoolean(QUIET,isQuiet);
         editor.commit();
-    }
-
-    public boolean isQuiet(){
-        return sp.getBoolean(QUIET,false);
     }
 
     public void setRepeat(boolean isRepeated){
@@ -127,30 +131,12 @@ public class SharedPreferenceUtil {
         return sp.getBoolean(REPEAT,false);
     }
 
-    public void setRunningId(int _id) {
-        editor.putInt(RUNNING_ID,_id);
-        editor.commit();
-    }
-
     public int getRunningId() {
         return sp.getInt(RUNNING_ID,-1);
     }
 
-    public void setHeightToScale(int heightToScale) {
-        editor.putInt(HEIGHT_TO_SCALE,heightToScale);
+    public void setRunningId(int _id) {
+        editor.putInt(RUNNING_ID,_id);
         editor.commit();
-    }
-
-    public int getHeightToScale() {
-        return sp.getInt(HEIGHT_TO_SCALE,0);
-    }
-
-    public void setHeightToMove(int heightToMove) {
-        editor.putInt(HEIGHT_TO_MOVE,heightToMove);
-        editor.commit();
-    }
-
-    public int getHeightToMove() {
-        return sp.getInt(HEIGHT_TO_MOVE,0);
     }
 }
