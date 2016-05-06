@@ -12,7 +12,6 @@ import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.repository.ScheduleRepository;
 import foocoder.dnd.services.ProfileDBHelper;
 import rx.Observable;
-import rx.Subscriber;
 
 /**
  * Created by xuechi.
@@ -33,15 +32,12 @@ public class ScheduleDataRepository implements ScheduleRepository {
 
     @Override
     public Observable<List<Schedule>> schedules() {
-        return Observable.create(new Observable.OnSubscribe<List<Schedule>>() {
-            @Override
-            public void call(Subscriber<? super List<Schedule>> subscriber) {
-                try {
-                    subscriber.onNext(dbHelper.getScheduleList());
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
+        return Observable.create(subscriber -> {
+            try {
+                subscriber.onNext(dbHelper.getScheduleList());
+                subscriber.onCompleted();
+            } catch (Exception e) {
+                subscriber.onError(e);
             }
         });
     }
@@ -65,7 +61,7 @@ public class ScheduleDataRepository implements ScheduleRepository {
 
     @Override
     public Observable<Boolean> saveSchedule(Schedule schedule) {
-        return Observable.<Boolean>create(subscriber -> {
+        return Observable.create(subscriber -> {
             if (schedule.from == null || schedule.to == null) {
                 throw new TimeNotSetException();
             }
@@ -77,7 +73,7 @@ public class ScheduleDataRepository implements ScheduleRepository {
 
     @Override
     public Observable<Boolean> updateSchedule(Schedule schedule) {
-        return Observable.<Boolean>create(subscriber -> {
+        return Observable.create(subscriber -> {
             if (schedule.from == null || schedule.to == null) {
                 throw new TimeNotSetException();
             }
