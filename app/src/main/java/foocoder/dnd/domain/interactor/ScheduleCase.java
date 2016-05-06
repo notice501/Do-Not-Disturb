@@ -19,6 +19,7 @@ import rx.schedulers.Schedulers;
 @SuppressWarnings("unchecked")
 public abstract class ScheduleCase<T> {
 
+    protected Observable<T> observable;
     @Inject
     ScheduleRepository scheduleRepository;
 

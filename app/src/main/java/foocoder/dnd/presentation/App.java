@@ -26,15 +26,19 @@ import timber.log.Timber;
 public class App extends Application {
 
     public static final String START_STOP_ACTION = "foocoder.dnd.startstop";
+
     public static final String AUTO_TIME_SCHEDULE = "foocoder.dnd.auto";
     private static App instance;
+
     @Inject
     SharedPreferenceUtil sp;
+
     @Inject
     Lazy<DeveloperSettings> developerSettingsLazy;
+
     @Inject
     ProfileDBHelper dbHelper;
-    private boolean _isUnavailable;
+
     private ApplicationComponent applicationComponent;
 
     public static App getContext() {
@@ -44,7 +48,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        CrashReport.initCrashReport(this, "900021069", BuildConfig.DEBUG);
 
         this.applicationComponent = provideApplicationComponent();
 
@@ -58,7 +61,6 @@ public class App extends Application {
         }
 
         instance = this;
-        _isUnavailable = false;
     }
 
     public ApplicationComponent getApplicationComponent() {
@@ -73,14 +75,6 @@ public class App extends Application {
 
     public synchronized SharedPreferenceUtil getSharedPreferenceUtil() {
         return sp;
-    }
-
-    public boolean get_isUnavailable() {
-        return _isUnavailable;
-    }
-
-    public void set_isUnavailable(boolean _flag) {
-        this._isUnavailable = _flag;
     }
 
     public boolean hasNumber(String number) {
@@ -101,16 +95,8 @@ public class App extends Application {
         return dbHelper.getSchedule(_id);
     }
 
-    public boolean updateSchedule(Schedule sch) {
-        return dbHelper.updateSchedule(sch);
-    }
-
     public List<Schedule> getScheduleList() {
         return dbHelper.getScheduleList();
-    }
-
-    public boolean delSchedule(Schedule sch) {
-        return dbHelper.delSchedule(sch);
     }
 
     public List<Contact> getContacts() {

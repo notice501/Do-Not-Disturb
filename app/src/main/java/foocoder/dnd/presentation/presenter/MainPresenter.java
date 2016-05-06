@@ -65,7 +65,7 @@ public class MainPresenter extends Presenter<MainSettingView> {
         super.bindView(view);
 
         view.changeState(false);
-        view.changeAutoRecoverState(spUtil.isRecoverable());
+        view.changeAutoRecoverState(false);
         view.changeLauncherState(spUtil.isLaunched());
         view.changeTimerState(spUtil.isStarted());
         view.changeVibrationState(spUtil.isVib());
@@ -81,6 +81,7 @@ public class MainPresenter extends Presenter<MainSettingView> {
     }
 
     public void addSchedule(Schedule schedule) {
+        this.schedule.copy(schedule);
         int _id = spUtil.getId() + 2;
         spUtil.setId(schedule._id = _id);
         if (!spUtil.isStarted()) {

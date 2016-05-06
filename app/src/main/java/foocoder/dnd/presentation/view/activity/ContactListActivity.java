@@ -140,6 +140,7 @@ public final class ContactListActivity extends BaseActivity<ContactComponent> im
         }
     }
 
+    @Override
     protected ContactComponent getComponent() {
         return getApplicationComponent()
                 .contactComponentBuilder()

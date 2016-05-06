@@ -13,6 +13,7 @@ import foocoder.dnd.domain.repository.ScheduleRepository;
 import foocoder.dnd.presentation.App;
 import foocoder.dnd.services.ProfileDBHelper;
 import foocoder.dnd.utils.SharedPreferenceUtil;
+import foocoder.dnd.utils.rxpreference.RxPreference;
 
 @Module
 public class ApplicationModule {
@@ -55,7 +56,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferenceUtil provideSharedPreferenceUtil() {
-        return new SharedPreferenceUtil(app);
+    SharedPreferenceUtil provideSharedPreferenceUtil(RxPreference rxPreference) {
+        return new SharedPreferenceUtil(rxPreference);
+    }
+
+    @Provides
+    @Singleton
+    RxPreference provideRxPreference(Application context) {
+        return RxPreference.getInstance("dnd", context);
     }
 }

@@ -1,7 +1,5 @@
 package foocoder.dnd.domain.interactor;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import foocoder.dnd.domain.Schedule;
@@ -14,15 +12,15 @@ import rx.Observable;
  */
 public class SaveSchedule extends ScheduleCase<Boolean> {
 
-    private List<Schedule> scheduleList;
+    private Schedule schedule;
 
     @Inject
-    public SaveSchedule(List<Schedule> scheduleList) {
-        this.scheduleList = scheduleList;
+    public SaveSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 
     @Override
     protected Observable<Boolean> buildContactCaseObservable() {
-        return this.scheduleRepository.saveSchedule(scheduleList.get(scheduleList.size() - 1));
+        return this.scheduleRepository.saveSchedule(schedule);
     }
 }
