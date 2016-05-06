@@ -24,7 +24,7 @@ public abstract class ContactCase {
 
     private Observable.Transformer<?, ?> getTransformer() {
         return objectObservable -> objectObservable
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }
