@@ -8,7 +8,7 @@ import foocoder.dnd.presentation.internal.di.modules.ActivityModule;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
-public abstract class BaseActivity<T> extends Activity {
+public abstract class BaseActivity<COMPONENT> extends Activity {
 
     private CompositeSubscription subscriptions = new CompositeSubscription();
 
@@ -26,7 +26,7 @@ public abstract class BaseActivity<T> extends Activity {
         }
     }
 
-    protected abstract T getComponent();
+    protected abstract COMPONENT getComponent();
 
     @Override
     protected void onDestroy() {

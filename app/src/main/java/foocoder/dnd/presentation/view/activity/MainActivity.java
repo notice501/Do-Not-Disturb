@@ -5,9 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -15,7 +13,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
@@ -49,9 +46,19 @@ import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 import rx.Subscription;
 
+import static android.media.AudioManager.RINGER_MODE_NORMAL;
+import static android.media.AudioManager.RINGER_MODE_SILENT;
+import static android.media.AudioManager.RINGER_MODE_VIBRATE;
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
+import static android.view.View.SCALE_X;
+import static android.view.View.SCALE_Y;
+import static android.view.View.TRANSLATION_Y;
+import static android.view.animation.Animation.RELATIVE_TO_SELF;
+import static android.widget.Toast.LENGTH_LONG;
+import static foocoder.dnd.presentation.App.START_STOP_ACTION;
 import static foocoder.dnd.utils.SharedPreferenceUtil.START;
 
+@SuppressWarnings({"unused", "Convert2streamapi"})
 public final class MainActivity extends BaseActivity<MainComponent> implements MainSettingView {
 
     @Inject
@@ -66,9 +73,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @BindView(R.id.big_fab)
     ImageButton fab;
 
-//    @BindView(R.id.recover_swh)
-//    Switch recover_swh;
-
     @BindView(R.id.launch)
     Switch launch;
 
@@ -79,7 +83,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     ImageButton add;
 
     @BindView(R.id.schs)
-    ListView schs;
+    ListView listView;
 
     @BindView(R.id.vibr_switch)
     Switch vibr_switch;
@@ -105,9 +109,8 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @Inject
     ScheduleAdapter adapter;
 
-    private AudioManager audio;
-
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    @Inject
+    AudioManager audio;
 
     private boolean open_setting;
 
@@ -126,16 +129,11 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         getComponent().inject(this);
         mainPresenter.bindView(this);
 
-        listener = new MyListener();
         open_setting = false;
-
-        sp.registerListener(listener);
-        audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
         timepicker.setVisibility(sp.isQuiet() ? View.VISIBLE : View.GONE);
 
-        schs.setAdapter(adapter);
-        schs.setDivider(null);
+        listView.setAdapter(adapter);
+        listView.setDivider(null);
         mainPresenter.start();
 
         getWindow().getDecorView().post(() -> {
@@ -155,25 +153,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         return getApplicationComponent().add(new ActivityModule(this));
     }
 
-    @Override
-    protected void onDestroy() {
-        sp.unregisterListener(listener);
-
-        super.onDestroy();
-    }
-
-//    @OnCheckedChanged(R.id.recover_swh)
-//    void onRecoverSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
-//        sp.setRecover(isChecked);
-//
-//        if (sp.isStarted()) {
-//            if (isChecked) {
-//                startService(new Intent(MainActivity.this, ListenerService.class).putExtra("note", getString(R.string.manual_auto_cancel)));
-//            }
-//
-//        }
-//    }
-
     @OnCheckedChanged(R.id.launch)
     void onLaunchSwitchCheckedChange(CompoundButton buttonView, boolean isChecked) {
         sp.setLaunch(isChecked);
@@ -181,28 +160,20 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         if (isChecked) {
             if (sp.isStarted()) {
                 if (sp.isVib()) {
-                    audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                    audio.setRingerMode(RINGER_MODE_VIBRATE);
                 }
-            } else {
-                if (sp.isQuiet()) {
-//                            startService(new Intent(MainActivity.this,TimeService.class));
-                }
-            }
+            }  
         } else {
             if (sp.isStarted()) {
                 if (sp.isVib()) {
                     switch (audio.getRingerMode()) {
-                        case AudioManager.RINGER_MODE_NORMAL:
-                            audio.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                        case AudioManager.RINGER_MODE_VIBRATE:
-                            audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                        case RINGER_MODE_NORMAL:
+                            audio.setRingerMode(RINGER_MODE_NORMAL);
+                        case RINGER_MODE_VIBRATE:
+                            audio.setRingerMode(RINGER_MODE_SILENT);
                     }
                 }
-            } else {
-                if (sp.isQuiet()) {
-//                            stopService(new Intent(MainActivity.this,TimeService.class));
-                }
-            }
+            } 
         }
     }
 
@@ -213,18 +184,17 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
         if (isChecked) {
             if (!sp.isStarted()) {
-                if (global.getScheduleList().size() > 0) {
-                    for (Schedule schedule : global.getScheduleList()) {
-                        AlarmUtil.startSchedule(MainActivity.this, schedule);
+                if (mainPresenter.getSchedules().size() > 0) {
+                    for (Schedule schedule : mainPresenter.getSchedules()) {
+                        AlarmUtil.startSchedule(schedule);
                     }
                 }
             }
         } else {
             if (!sp.isStarted()) {
-                if (global.getScheduleList().size() > 0) {
-                    for (Schedule schedule : global.getScheduleList()) {
-                        AlarmUtil.cancelOldAlarm(MainActivity.this, schedule);
-//                                    stopService(new Intent(MainActivity.this,ListenerService.class));
+                if (mainPresenter.getSchedules().size() > 0) {
+                    for (Schedule schedule : mainPresenter.getSchedules()) {
+                        AlarmUtil.cancelOldAlarm(schedule);
                     }
                     sp.setRunningId(-1);
                     sp.enable(false);
@@ -240,12 +210,12 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         if (sp.isLaunched()) {
             if (isChecked) {
                 if (sp.isStarted()) {
-                    audio.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                    audio.setRingerMode(RINGER_MODE_VIBRATE);
                 }
             } else {
                 if (sp.isStarted()) {
-                    if (audio.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-                        audio.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    if (audio.getRingerMode() == RINGER_MODE_VIBRATE) {
+                        audio.setRingerMode(RINGER_MODE_SILENT);
                     }
                 }
             }
@@ -263,7 +233,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
                 mainPresenter.getSchedule(position));
         dialogFragment.setOnScheduleSetListener(schedule -> {
             if (schedule.del) {
-                AlarmUtil.cancelOldAlarm(this, schedule);
                 mainPresenter.deleteSchedule(schedule);
             } else {
                 mainPresenter.updateSchedule(schedule, position);
@@ -280,7 +249,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         TimeDialogFragment dialogFragment = TimeDialogFragment.newInstance(null);
         dialogFragment.setOnScheduleSetListener(schedule -> {
             if (mainPresenter.getSchedules().size() >= 5) {
-                Toast.makeText(this, R.string.hint_desc, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.hint_desc, LENGTH_LONG).show();
             } else {
                 mainPresenter.addSchedule(schedule);
                 adapter.notifyDataSetChanged();
@@ -293,7 +262,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
     @OnClick(R.id.big_fab)
     void onFabClick(View view) {
-        sendBroadcast(new Intent().setAction(App.START_STOP_ACTION));
+        sendBroadcast(new Intent().setAction(START_STOP_ACTION));
     }
 
     @OnClick(R.id.white_btn)
@@ -304,11 +273,6 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     @Override
     public void changeState(boolean enabled) {
         fab.setImageResource(enabled ? R.drawable.shut12 : R.drawable.shut1);
-    }
-
-    @Override
-    public void changeAutoRecoverState(boolean enabled) {
-//        recover_swh.setChecked(sp.isRecoverable());
     }
 
     @Override
@@ -337,12 +301,12 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
     }
 
     private void initAnim() {
-        ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.3f)
-                , PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.3f)
-                , PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 1f, heightToScale));
+        ObjectAnimator scaleOpen = ObjectAnimator.ofPropertyValuesHolder(fab, PropertyValuesHolder.ofFloat(SCALE_X, 1f, 0.3f)
+                , PropertyValuesHolder.ofFloat(SCALE_Y, 1f, 0.3f)
+                , PropertyValuesHolder.ofFloat(TRANSLATION_Y, 1f, heightToScale));
         scaleOpen.setDuration(220);
 
-        final RotateAnimation rotateOpen = new RotateAnimation(0, -180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        final RotateAnimation rotateOpen = new RotateAnimation(0, -180, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
         rotateOpen.setDuration(335);
         rotateOpen.setFillAfter(true);
 
@@ -358,7 +322,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
             }
         });
 
-        RotateAnimation rotateClose = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        RotateAnimation rotateClose = new RotateAnimation(0, 180, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
         rotateClose.setDuration(335);
         rotateClose.setFillAfter(true);
 
@@ -387,29 +351,19 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
         });
         addSubscriptionsForUnbinding(subscription);
 
-//        LayoutTransition transition = new LayoutTransition();
-//        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(schs, PropertyValuesHolder.ofFloat(View.SCALE_Y, 0, 1));
-//        appear.setDuration(100);
-//        appear.setInterpolator(new OvershootInterpolator());
-//        transition.setAnimator(LayoutTransition.APPEARING, appear);
-//        more_setting.setLayoutTransition(transition);
-    }
-
-    private class MyListener implements SharedPreferences.OnSharedPreferenceChangeListener {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(START)) {
-                AnimationDrawable animationDrawable;
-                if (sharedPreferences.getBoolean(START, false)) {
-                    fab.setImageResource(R.drawable.shutup);
-                    animationDrawable = (AnimationDrawable) fab.getDrawable();
-                    animationDrawable.start();
-                } else {
-                    fab.setImageResource(R.drawable.openup);
-                    animationDrawable = (AnimationDrawable) fab.getDrawable();
-                    animationDrawable.start();
-                }
-            }
-        }
+        Subscription subscription1 = sp.getChangeObservable(START, false)
+                .subscribe(aBoolean -> {
+                    AnimationDrawable animationDrawable;
+                    if (aBoolean) {
+                        fab.setImageResource(R.drawable.shutup);
+                        animationDrawable = (AnimationDrawable) fab.getDrawable();
+                        animationDrawable.start();
+                    } else {
+                        fab.setImageResource(R.drawable.openup);
+                        animationDrawable = (AnimationDrawable) fab.getDrawable();
+                        animationDrawable.start();
+                    }
+                });
+        addSubscriptionsForUnbinding(subscription1);
     }
 }

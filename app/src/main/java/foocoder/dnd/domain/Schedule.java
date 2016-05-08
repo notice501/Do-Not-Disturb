@@ -70,14 +70,6 @@ public class Schedule implements Parcelable {
         this.checked = checked;
     }
 
-    public boolean isDel() {
-        return del;
-    }
-
-    public void setDel(boolean del) {
-        this.del = del;
-    }
-
     public int getId() {
         return this._id;
     }

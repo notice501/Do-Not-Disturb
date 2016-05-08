@@ -1,9 +1,7 @@
 package foocoder.dnd.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import foocoder.dnd.utils.rxpreference.RxPreference;
+import rx.Observable;
 
 public class SharedPreferenceUtil {
 
@@ -13,130 +11,93 @@ public class SharedPreferenceUtil {
     public static final String START = "start";
 
     //自动勿扰
-    private static final String USABLE = "usable";
+    public static final String USABLE = "usable";
 
     //勿扰设置
-    private static final String LAUNCH = "launch";
-
-    //自动恢复
-    private static final String RECOVER = "recover";
+    public static final String LAUNCH = "launch";
 
     //震动
-    private static final String VIBRATE = "vibrate";
+    public static final String VIBRATE = "vibrate";
 
     //定时勿扰
-    private static final String QUIET = "QUIET";
+    public static final String QUIET = "quiet";
 
     //重复来电
-    private static final String REPEAT = "repeat";
+    public static final String REPEAT = "repeat";
 
-    private static final String RUNNING_ID = "running_id";
+    public static final String RUNNING_ID = "running_id";
 
-    private static final String HEIGHT_TO_SCALE = "heightToScale";
+    public RxPreference rxPreference;
 
-    private static final String HEIGHT_TO_MOVE = "heightToMove";
-
-    private SharedPreferences sp;
-
-    private SharedPreferences.Editor editor;
-
-    private RxPreference rxPreference;
-
-    public SharedPreferenceUtil(Context context) {
-        sp = context.getSharedPreferences("preferences", Context.MODE_PRIVATE);
-        editor = sp.edit();
-    }
-
-    public void registerListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        if (sp != null) {
-            sp.registerOnSharedPreferenceChangeListener(listener);
-        }
-    }
-
-    public void unregisterListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        if (sp != null) {
-            sp.unregisterOnSharedPreferenceChangeListener(listener);
-        }
+    public SharedPreferenceUtil(RxPreference rxPreference) {
+        this.rxPreference = rxPreference;
     }
 
     public int getId() {
-        return sp.getInt(MAX_ID,0);
+        return rxPreference.getValue(MAX_ID, 0);
     }
 
     public void setId(int id) {
-        editor.putInt(MAX_ID,id);
-        editor.commit();
+        rxPreference.putValue(MAX_ID, id);
     }
 
     public void start(boolean isStarted) {
-        editor.putBoolean(START,isStarted);
-        editor.commit();
+        rxPreference.putValue(START, isStarted);
     }
 
     public boolean isStarted(){
-        return sp.getBoolean(START,false);
+        return rxPreference.getValue(START,false);
     }
 
     public void enable(boolean isUsable){
-        editor.putBoolean(USABLE,isUsable);
-        editor.commit();
+        rxPreference.putValue(USABLE, isUsable);
     }
 
     public boolean isUsable(){
-        return sp.getBoolean(USABLE,false);
+        return rxPreference.getValue(USABLE, false);
     }
 
     public void setLaunch(boolean isUsable){
-        editor.putBoolean(LAUNCH,isUsable);
-        editor.commit();
+        rxPreference.putValue(LAUNCH, isUsable);
     }
 
     public boolean isLaunched(){
-        return sp.getBoolean(LAUNCH,false);
-    }
-
-    public void setRecover(boolean isRecoverable){
-        editor.putBoolean(RECOVER,isRecoverable);
-        editor.commit();
-    }
-
-    public boolean isRecoverable(){
-        return sp.getBoolean(RECOVER,false);
+        return rxPreference.getValue(LAUNCH, false);
     }
 
     public boolean isVib() {
-        return sp.getBoolean(VIBRATE, false);
+        return rxPreference.getValue(VIBRATE, false);
     }
 
     public void setVib(boolean isVib) {
-        editor.putBoolean(VIBRATE, isVib);
-        editor.commit();
+        rxPreference.putValue(VIBRATE, isVib);
     }
 
     public boolean isQuiet(){
-        return sp.getBoolean(QUIET,false);
+        return rxPreference.getValue(QUIET, false);
     }
 
     public void setQuiet(boolean isQuiet){
-        editor.putBoolean(QUIET,isQuiet);
-        editor.commit();
+        rxPreference.putValue(QUIET, isQuiet);
     }
 
     public void setRepeat(boolean isRepeated){
-        editor.putBoolean(REPEAT,isRepeated);
-        editor.commit();
+        rxPreference.putValue(REPEAT, isRepeated);
     }
 
     public boolean isRepeated(){
-        return sp.getBoolean(REPEAT,false);
+        return rxPreference.getValue(REPEAT, false);
     }
 
     public int getRunningId() {
-        return sp.getInt(RUNNING_ID,-1);
+        return rxPreference.getValue(RUNNING_ID, -1);
     }
 
     public void setRunningId(int _id) {
-        editor.putInt(RUNNING_ID,_id);
-        editor.commit();
+        rxPreference.putValue(RUNNING_ID, _id);
+    }
+    
+    public <T> Observable<T> getChangeObservable(String key, T defaultValue) {
+        return rxPreference.getChangeObservable(key, defaultValue);
     }
 }

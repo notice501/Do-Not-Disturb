@@ -10,7 +10,6 @@ import javax.inject.Named;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.interactor.DefaultSubscriber;
 import foocoder.dnd.domain.interactor.ScheduleCase;
-import foocoder.dnd.presentation.App;
 import foocoder.dnd.presentation.internal.di.PerActivity;
 import foocoder.dnd.presentation.view.MainSettingView;
 import foocoder.dnd.utils.AlarmUtil;
@@ -65,7 +64,6 @@ public class MainPresenter extends Presenter<MainSettingView> {
         super.bindView(view);
 
         view.changeState(false);
-        view.changeAutoRecoverState(false);
         view.changeLauncherState(spUtil.isLaunched());
         view.changeTimerState(spUtil.isStarted());
         view.changeVibrationState(spUtil.isVib());
@@ -81,11 +79,10 @@ public class MainPresenter extends Presenter<MainSettingView> {
     }
 
     public void addSchedule(Schedule schedule) {
+        spUtil.setId(schedule._id = spUtil.getId() + 2);
         this.schedule.copy(schedule);
-        int _id = spUtil.getId() + 2;
-        spUtil.setId(schedule._id = _id);
         if (!spUtil.isStarted()) {
-            AlarmUtil.startSchedule(App.getContext(), schedule);
+            AlarmUtil.startSchedule(schedule);
         }
         schedules.add(schedule);
         addSubscriptionsForUnbinding(saveSchedule.execute(new OperationSubscriber()));
@@ -94,13 +91,14 @@ public class MainPresenter extends Presenter<MainSettingView> {
     public void updateSchedule(Schedule schedule, int position) {
         this.schedule.copy(schedule);
         this.schedules.set(position, schedule);
-        if (spUtil.isStarted()) {
-            AlarmUtil.startSchedule(App.getContext(), schedule);
+        if (!spUtil.isStarted()) {
+            AlarmUtil.startSchedule(schedule);
         }
         addSubscriptionsForUnbinding(updateSchedule.execute(new OperationSubscriber()));
     }
 
     public void deleteSchedule(Schedule schedule) {
+        AlarmUtil.cancelOldAlarm(schedule);
         this.schedule.copy(schedule);
         this.schedules.remove(schedule);
         if (schedules.size() == 0) {

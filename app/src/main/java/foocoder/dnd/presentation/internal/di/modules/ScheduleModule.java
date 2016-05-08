@@ -9,6 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.interactor.DeleteSchedule;
+import foocoder.dnd.domain.interactor.GetSchedule;
 import foocoder.dnd.domain.interactor.GetSchedules;
 import foocoder.dnd.domain.interactor.SaveSchedule;
 import foocoder.dnd.domain.interactor.ScheduleCase;
@@ -53,5 +54,11 @@ public class ScheduleModule {
     @Singleton
     Schedule provideScheduleForOperation() {
         return new Schedule();
+    }
+
+    @Provides
+    @Singleton
+    ScheduleCase<Schedule> provideSchedule(GetSchedule getSchedule) {
+        return getSchedule;
     }
 }

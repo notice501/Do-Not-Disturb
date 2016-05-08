@@ -7,60 +7,91 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
-import java.util.Calendar;
 
-import foocoder.dnd.presentation.App;
+import org.joda.time.DateTime;
+
+import javax.inject.Inject;
+
 import foocoder.dnd.domain.Schedule;
+import foocoder.dnd.domain.interactor.DefaultSubscriber;
+import foocoder.dnd.domain.interactor.ScheduleCase;
+import foocoder.dnd.presentation.App;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
+
+import static android.app.AlarmManager.RTC_WAKEUP;
+import static foocoder.dnd.presentation.App.AUTO_TIME_SCHEDULE;
 
 public class TimeReceiver extends BroadcastReceiver {
+
+    @Inject
+    AlarmManager alarmManager;
+
+    @Inject
+    AudioManager audioManager;
+
+    @Inject
+    SharedPreferenceUtil spUtil;
+
+    @Inject
+    ScheduleCase<Schedule> getSchedule;
+
+    @Inject
+    Schedule scheduleForOp;
+
+    private Schedule schedule;
+
+    private int daysTillNext;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        App settings = (App) App.getContext();
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        SharedPreferenceUtil spUtil = settings.getSharedPreferenceUtil();
+        App.getContext().getApplicationComponent().inject(this);
         Bundle extras = intent.getExtras();
+        Subscription subscription = Subscriptions.empty();
 
-        if (App.AUTO_TIME_SCHEDULE.equals(intent.getAction())) {
+        if (AUTO_TIME_SCHEDULE.equals(intent.getAction())) {
             if (extras.getBoolean("notify", false)) {
-                Schedule schedule = settings.getScheduleById(spUtil.getRunningId());
-                AlarmUtil.setSilent(context,true,schedule);
-                AlarmUtil.startSchedule(context,schedule);
+                scheduleForOp._id = spUtil.getRunningId();
+                AlarmUtil.setSilent(true, schedule);
+                AlarmUtil.startSchedule(schedule);
             } else {
-                int _id = extras.getInt("id",0);
-                boolean sound_enable = extras.getBoolean("sound_enable",false);
-                boolean cross_night = extras.getBoolean("cross_night",false);
+                int _id = extras.getInt("id", 0);
+                boolean sound_enable = extras.getBoolean("sound_enable", false);
+                boolean cross_night = extras.getBoolean("cross_night", false);
+                scheduleForOp._id = _id % 2 == 0 ? _id : _id - 1;
 
-                Intent newIntent = new Intent(context,TimeReceiver.class).setAction(App.AUTO_TIME_SCHEDULE);
+                Intent newIntent = new Intent(context, TimeReceiver.class).setAction(AUTO_TIME_SCHEDULE);
                 newIntent.putExtras(extras);
-                PendingIntent pendingIntent = AlarmUtil.getPendingIntent(context,_id,newIntent);
+                PendingIntent pendingIntent = AlarmUtil.getPendingIntent(context, _id, newIntent);
 
-                Calendar calendar = Calendar.getInstance();
-                int daysTillNext;
-                Schedule schedule;
-                if (_id % 2 != 0) {
-                    schedule = settings.getScheduleById(_id - 1);
-                    daysTillNext = AlarmUtil.daysTillNext(schedule,cross_night);
-                } else {
-                    schedule = settings.getScheduleById(_id);
-                    daysTillNext = AlarmUtil.daysTillNext(schedule);
-                }
-                calendar.add(Calendar.DATE, daysTillNext);
+                subscription = getSchedule.execute(new DefaultSubscriber<Schedule>() {
+                    @Override
+                    public void onNext(Schedule result) {
+                        schedule = result;
+                        if (_id % 2 != 0) {
+                            daysTillNext = AlarmUtil.daysTillNext(schedule, cross_night);
+                        } else {
+                            daysTillNext = AlarmUtil.daysTillNext(schedule);
+                        }
+                        DateTime trigger = DateTime.now().plusDays(daysTillNext);
 
-                alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
+                        alarmManager.setExact(RTC_WAKEUP, trigger.getMillis(), pendingIntent);
 
-                AlarmUtil.setSilent(context,sound_enable,schedule);
+                        AlarmUtil.setSilent(sound_enable, schedule);
+                    }
+                });
             }
         } else {
             if (audioManager.getRingerMode() > 1) {
                 if (spUtil.isUsable()) {
                     spUtil.setRunningId(-1);
                     spUtil.enable(false);
-                    context.stopService(new Intent(context,ListenerService.class));
+                    context.stopService(new Intent(context, ListenerService.class));
                 }
             }
         }
+//        subscription.unsubscribe();
     }
 }

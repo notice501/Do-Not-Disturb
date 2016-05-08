@@ -9,8 +9,6 @@ public interface MainSettingView {
 
     void changeState(boolean enabled);
 
-    void changeAutoRecoverState(boolean enabled);
-
     void changeLauncherState(boolean enabled);
 
     void changeTimerState(boolean enabled);

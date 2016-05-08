@@ -11,6 +11,7 @@ import foocoder.dnd.presentation.internal.di.modules.ScheduleModule;
 import foocoder.dnd.presentation.internal.di.modules.SystemServiceModule;
 import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
 import foocoder.dnd.services.StartStopReceiver;
+import foocoder.dnd.services.TimeReceiver;
 
 @Singleton
 @Component(modules = {ApplicationModule.class, DeveloperModule.class,
@@ -22,6 +23,8 @@ public interface ApplicationComponent {
     void inject(TimeDialogFragment fragment);
 
     void inject(StartStopReceiver receiver);
+
+    void inject(TimeReceiver receiver);
 
     ContactComponent.Builder contactComponentBuilder();
 

@@ -70,10 +70,10 @@ public final class RxPreference {
         editor.apply();
     }
 
-    public Observable<String> getChangeObservable(@NonNull String key) {
+    public <T> Observable<T> getChangeObservable(@NonNull String key, T defaultValue) {
         return observable
                 .filter(s -> Objects.equals(s, key))
-                .map(s -> sharedPreferences.getString(key, ""));
+                .map(s -> getValue(key, defaultValue));
     }
 
     public <T> Action1<T> getAction(String key) {
