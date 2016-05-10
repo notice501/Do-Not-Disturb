@@ -1,17 +1,25 @@
 package foocoder.dnd.services;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
+import javax.inject.Inject;
+
 import foocoder.dnd.R;
-import foocoder.dnd.presentation.view.activity.NotifyActivity;
+import foocoder.dnd.presentation.view.activity.MainActivity;
 
 public class ListenerService extends Service {
 
-    private String noteStr;
+    private static final int NOTIFICATION_ID = 1024;
+    @Inject
+    NotificationManager manager;
+    private String note;
+    private Notification.Builder builder;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -29,32 +37,35 @@ public class ListenerService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        noteStr = "";
+        manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        builder = new Notification.Builder(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        note = intent.getStringExtra("note");
+        if (note != null) {
+            showNotification();
+        } else {
+            stopForeground(true);
+        }
 
-        noteStr = intent.getStringExtra("note");
-        startService();
-
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
-    private void startService() {
-        Intent i = new Intent(this, NotifyActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
+    private void showNotification() {
+        Intent i = new Intent(this, MainActivity.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification note = new Notification.Builder(this)
-                .setContentIntent(pi)
+        Notification notification = builder.setContentIntent(pi)
                 .setContentTitle(getString(R.string.running_hint))
-                .setContentText(noteStr)
+                .setContentText(note)
                 .setSmallIcon(R.drawable.volume_off)
-                .setWhen(java.lang.System.currentTimeMillis())
-//                .build();
-                .getNotification();
-        startForeground(1337, note);
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setWhen(System.currentTimeMillis())
+                .build();
+
+        startForeground(NOTIFICATION_ID, notification);
     }
 }

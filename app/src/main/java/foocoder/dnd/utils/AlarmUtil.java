@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
 
@@ -58,8 +57,8 @@ public class AlarmUtil {
 
     /**
      *
-     * @param sound_enable 是否打开静音 false则打开静音
-     * @param schedule 当前静音计划
+     * @param sound_enable if or not make silence. false means silent
+     * @param schedule current mute schedule
      */
     public static void setSilent(boolean sound_enable, Schedule schedule) {
         if (!sound_enable) {
@@ -76,7 +75,7 @@ public class AlarmUtil {
                 spUtil.setRunningId(-1);
                 spUtil.enable(false);
                 audioManager.setRingerMode(RINGER_MODE_NORMAL);
-                context.stopService(new Intent(context, ListenerService.class));
+                context.startService(new Intent(context, ListenerService.class));
             }
         }
     }
@@ -88,13 +87,13 @@ public class AlarmUtil {
             DateTime now = DateTime.now();
             int today = now.getDayOfWeek();
 
-            String[] start = schedule.getFrom().split(":");
+            String[] start = schedule.from.split(":");
             DateTime from = DateTime.now()
                     .withDayOfWeek(today)
                     .withHourOfDay(Integer.parseInt(start[0]))
                     .withMinuteOfHour(Integer.parseInt(start[1]))
                     .withSecondOfMinute(0);
-            String[] end = schedule.getTo().split(":");
+            String[] end = schedule.to.split(":");
             DateTime to = DateTime.now()
                     .withDayOfWeek(today)
                     .withHourOfDay(Integer.parseInt(end[0]))
@@ -180,7 +179,7 @@ public class AlarmUtil {
         return daysTillNext;
     }
 
-    public static int daysTillNext(@NonNull Schedule schedule, boolean cross_night) {
+    public static int daysTillNext(Schedule schedule, boolean cross_night) {
         if (cross_night) {
             int today = DateTime.now().getDayOfWeek();
             if (daysEnabled(schedule).contains(today)) {
@@ -212,9 +211,8 @@ public class AlarmUtil {
         PendingIntent newCancel = getPendingIntent(context, schedule._id + 1, temp);
         newCancel.cancel();
         alarmManager.cancel(newCancel);
-        if (spUtil.getRunningId() != -1 && spUtil.getRunningId() == schedule._id && spUtil.isUsable()) {
-            spUtil.setRunningId(-1);
-            context.stopService(new Intent(context, ListenerService.class));
+        if (spUtil.getRunningId() != -1 && spUtil.isUsable()) {
+            setSilent(true, schedule);
         }
     }
 
@@ -226,13 +224,13 @@ public class AlarmUtil {
             currentDay = SUNDAY;
         }
 
-        String[] start = schedule.getFrom().split(":");
+        String[] start = schedule.from.split(":");
         Calendar calFrom = Calendar.getInstance();
         calFrom.set(Calendar.DAY_OF_WEEK, currentDay);
         calFrom.set(Calendar.HOUR_OF_DAY, Integer.parseInt(start[0]));
         calFrom.set(Calendar.MINUTE, Integer.parseInt(start[1]));
         calFrom.set(Calendar.SECOND, 0);
-        String[] end = schedule.getTo().split(":");
+        String[] end = schedule.to.split(":");
         Calendar calEnd = Calendar.getInstance();
         calEnd.set(Calendar.DAY_OF_WEEK, currentDay);
         calEnd.set(Calendar.HOUR_OF_DAY, Integer.parseInt(end[0]));

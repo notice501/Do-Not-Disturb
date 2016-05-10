@@ -18,8 +18,6 @@ import foocoder.dnd.domain.interactor.ScheduleCase;
 import foocoder.dnd.presentation.App;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 
 import static android.app.AlarmManager.RTC_WAKEUP;
 import static foocoder.dnd.presentation.App.AUTO_TIME_SCHEDULE;
@@ -49,7 +47,6 @@ public class TimeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         App.getContext().getApplicationComponent().inject(this);
         Bundle extras = intent.getExtras();
-        Subscription subscription = Subscriptions.empty();
 
         if (AUTO_TIME_SCHEDULE.equals(intent.getAction())) {
             if (extras.getBoolean("notify", false)) {
@@ -66,7 +63,7 @@ public class TimeReceiver extends BroadcastReceiver {
                 newIntent.putExtras(extras);
                 PendingIntent pendingIntent = AlarmUtil.getPendingIntent(context, _id, newIntent);
 
-                subscription = getSchedule.execute(new DefaultSubscriber<Schedule>() {
+                getSchedule.execute(new DefaultSubscriber<Schedule>() {
                     @Override
                     public void onNext(Schedule result) {
                         schedule = result;
@@ -88,10 +85,9 @@ public class TimeReceiver extends BroadcastReceiver {
                 if (spUtil.isUsable()) {
                     spUtil.setRunningId(-1);
                     spUtil.enable(false);
-                    context.stopService(new Intent(context, ListenerService.class));
+                    context.startService(new Intent(context, ListenerService.class));
                 }
             }
         }
-//        subscription.unsubscribe();
     }
 }
