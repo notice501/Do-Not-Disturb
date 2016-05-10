@@ -10,6 +10,8 @@ import foocoder.dnd.presentation.internal.di.modules.ApplicationModule;
 import foocoder.dnd.presentation.internal.di.modules.ScheduleModule;
 import foocoder.dnd.presentation.internal.di.modules.SystemServiceModule;
 import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
+import foocoder.dnd.services.ListenerService;
+import foocoder.dnd.services.NotificationService;
 import foocoder.dnd.services.StartStopReceiver;
 import foocoder.dnd.services.TimeReceiver;
 
@@ -26,7 +28,12 @@ public interface ApplicationComponent {
 
     void inject(TimeReceiver receiver);
 
+    void inject(NotificationService notificationService);
+
+    void inject(ListenerService listenerService);
+
     ContactComponent.Builder contactComponentBuilder();
 
     MainComponent add(ActivityModule activityModule);
+
 }

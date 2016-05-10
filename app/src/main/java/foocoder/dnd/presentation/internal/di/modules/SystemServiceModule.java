@@ -2,6 +2,7 @@ package foocoder.dnd.presentation.internal.di.modules;
 
 import android.app.AlarmManager;
 import android.app.Application;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.media.AudioManager;
 
@@ -28,5 +29,11 @@ public class SystemServiceModule {
     @Singleton
     AlarmManager provideAlarmManager(Application context) {
         return (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    }
+
+    @Provides
+    @Singleton
+    NotificationManager provideNotificationManager(Application context) {
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 }
