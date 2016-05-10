@@ -19,11 +19,17 @@ public class Schedule implements Parcelable {
             return new Schedule[size];
         }
     };
+
     public int _id;
+
     public String from;
+
     public String to;
+
     public List<Integer> checked;
+
     public boolean del;
+
     public boolean running;
 
     public Schedule() {}
@@ -44,38 +50,6 @@ public class Schedule implements Parcelable {
         in.readList(this.checked, Integer.class.getClassLoader());
         this.del = in.readByte() != 0;
         this.running = in.readByte() != 0;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public List<Integer> getChecked() {
-        return checked;
-    }
-
-    public void setChecked(List<Integer> checked) {
-        this.checked = checked;
-    }
-
-    public int getId() {
-        return this._id;
-    }
-
-    public void setId(int _id) {
-        this._id = _id;
     }
 
     @Override

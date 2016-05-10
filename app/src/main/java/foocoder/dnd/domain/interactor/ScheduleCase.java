@@ -1,7 +1,5 @@
 package foocoder.dnd.domain.interactor;
 
-import android.support.annotation.CheckResult;
-
 import javax.inject.Inject;
 
 import foocoder.dnd.domain.repository.ScheduleRepository;
@@ -23,7 +21,6 @@ public abstract class ScheduleCase<T> {
     @Inject
     ScheduleRepository scheduleRepository;
 
-    @CheckResult
     public final Subscription execute(Subscriber<T> subscriber) {
         return buildContactCaseObservable()
                 .subscribeOn(Schedulers.io())
