@@ -1,6 +1,9 @@
 #.gradle .idea and so on
 .*/
 
+#Ignores travis build file
+!.travis.yml
+
 #Intellij Idea files
 *.iml
 
