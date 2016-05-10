@@ -163,7 +163,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
     public List<Schedule> getScheduleList() {
         SQLiteDatabase db = this.getReadableDatabase();
-        List<Schedule> schedules = new ArrayList<>();
+        List<Schedule> schedules = new ArrayList<>(5);
 
         Cursor c = db.query(TABLE_SCHEDULES, null, null, null, null, null, null, null);
         if (c == null) {
@@ -172,7 +172,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
         while (c.moveToNext()) {
             Schedule schedule = new Schedule();
-            List<Integer> checked = new ArrayList<>();
+            List<Integer> checked = new ArrayList<>(7);
             schedule._id= c.getInt(0);
             schedule.from = c.getString(1);
             schedule.to = c.getString(2);
@@ -184,7 +184,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
             checked.add(c.getInt(7));
             checked.add(c.getInt(8));
             checked.add(c.getInt(9));
-            schedule.setChecked(checked);
+            schedule.checked = checked;
 
             schedules.add(schedule);
         }
@@ -196,16 +196,16 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
     public Schedule getSchedule(int _id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Schedule sch = null;
+        Schedule schedule = null;
 
         Cursor c = db.query(TABLE_SCHEDULES, null, COLUMN_ID + "=?", new String[]{_id + ""}, null, null, null);
         if (c != null) {
             while (c.moveToNext()) {
-                sch = new Schedule();
-                List<Integer> checked = new ArrayList<Integer>();
-                sch.setId(c.getInt(0));
-                sch.setFrom(c.getString(1));
-                sch.setTo(c.getString(2));
+                schedule = new Schedule();
+                List<Integer> checked = new ArrayList<>(7);
+                schedule._id = c.getInt(0);
+                schedule.from = c.getString(1);
+                schedule.to = c.getString(2);
 
                 checked.add(c.getInt(3));
                 checked.add(c.getInt(4));
@@ -214,7 +214,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
                 checked.add(c.getInt(7));
                 checked.add(c.getInt(8));
                 checked.add(c.getInt(9));
-                sch.setChecked(checked);
+                schedule.checked = checked;
             }
         }
 
@@ -222,36 +222,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
             c.close();
         }
 
-        return sch;
-    }
-
-    public List<Schedule> getScheduleByDay(String dayOfWeek) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        List<Schedule> schs = new ArrayList<Schedule>();
-
-        Cursor c = db.query(TABLE_SCHEDULES, null, dayOfWeek + "=?", new String[]{"1"}, null, null, null);
-        while (c.moveToNext()) {
-            Schedule sch = new Schedule();
-            List<Integer> checked = new ArrayList<Integer>();
-            sch.setId(c.getInt(0));
-            sch.setFrom(c.getString(1));
-            sch.setTo(c.getString(2));
-
-            checked.add(c.getInt(3));
-            checked.add(c.getInt(4));
-            checked.add(c.getInt(5));
-            checked.add(c.getInt(6));
-            checked.add(c.getInt(7));
-            checked.add(c.getInt(8));
-            checked.add(c.getInt(9));
-            sch.setChecked(checked);
-
-            schs.add(sch);
-        }
-
-        c.close();
-
-        return schs;
+        return schedule;
     }
 
     public void saveContacts(List<Contact> contacts) {

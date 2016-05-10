@@ -162,7 +162,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
                 if (sp.isVib()) {
                     audio.setRingerMode(RINGER_MODE_VIBRATE);
                 }
-            }  
+            }
         } else {
             if (sp.isStarted()) {
                 if (sp.isVib()) {
@@ -173,7 +173,7 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
                             audio.setRingerMode(RINGER_MODE_SILENT);
                     }
                 }
-            } 
+            }
         }
     }
 
@@ -196,9 +196,9 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
                     for (Schedule schedule : mainPresenter.getSchedules()) {
                         AlarmUtil.cancelOldAlarm(schedule);
                     }
-                    sp.setRunningId(-1);
-                    sp.enable(false);
                 }
+                sp.setRunningId(-1);
+                sp.enable(false);
             }
         }
     }

@@ -123,8 +123,8 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
         timePresenter.bindView(this);
 
         if (schedule != null) {
-            fromTime.setText(schedule.getFrom());
-            toTime.setText(schedule.getTo());
+            fromTime.setText(schedule.from);
+            toTime.setText(schedule.to);
         }
     }
 
@@ -139,7 +139,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
     void onTimeClick(View aView) {
         int hour, minute;
         if (schedule != null) {
-            String[] times = aView == fromTime ? schedule.getFrom().split(":") : schedule.getTo().split(":");
+            String[] times = aView == fromTime ? schedule.from.split(":") : schedule.to.split(":");
             hour = Integer.parseInt(times[0]);
             minute = Integer.parseInt(times[1]);
         } else {

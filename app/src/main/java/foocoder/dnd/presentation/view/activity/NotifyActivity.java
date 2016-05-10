@@ -25,37 +25,26 @@ public class NotifyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notify);
 
-        spUtil = ((App) App.getContext()).getSharedPreferenceUtil();
+        spUtil = App.getContext().getSharedPreferenceUtil();
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        app = (App) App.getContext();
+        app = App.getContext();
 
-        findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        findViewById(R.id.btn1).setOnClickListener(v -> finish());
         findViewById(R.id.add_1).setVisibility(spUtil.isStarted() ? View.GONE : View.VISIBLE);
-        findViewById(R.id.add_1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlarmUtil.pauseAlarm(NotifyActivity.this, app.getScheduleById(spUtil.getRunningId()));
-                finish();
-            }
+        findViewById(R.id.add_1).setOnClickListener(v -> {
+            AlarmUtil.pauseAlarm(NotifyActivity.this, null);
+            finish();
         });
-        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (spUtil.isStarted()) {
-                    sendBroadcast(new Intent().setAction(App.START_STOP_ACTION));
-                } else if (spUtil.isUsable()) {
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    spUtil.enable(false);
-                    spUtil.setRunningId(-1);
-                }
-                stopService(new Intent(NotifyActivity.this, ListenerService.class));
-                finish();
+        findViewById(R.id.stop).setOnClickListener(v -> {
+            if (spUtil.isStarted()) {
+                sendBroadcast(new Intent().setAction(App.START_STOP_ACTION));
+            } else if (spUtil.isUsable()) {
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                spUtil.enable(false);
+                spUtil.setRunningId(-1);
             }
+            stopService(new Intent(NotifyActivity.this, ListenerService.class));
+            finish();
         });
     }
 }
