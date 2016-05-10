@@ -14,10 +14,8 @@ import rx.schedulers.Schedulers;
  * Time: 2016 四月 29 12:01
  * Project: dnd
  */
-@SuppressWarnings("unchecked")
 public abstract class ScheduleCase<T> {
 
-    protected Observable<T> observable;
     @Inject
     ScheduleRepository scheduleRepository;
 

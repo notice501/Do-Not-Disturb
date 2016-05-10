@@ -13,11 +13,14 @@ import android.view.View;
 
 import foocoder.dnd.R;
 
+/**
+ * https://github.com/pavlospt/RoundedLetterView
+ */
 public class RoundedLetterView extends View {
 
+    private static final int DEFAULT_VIEW_SIZE = 96;
     private static int DEFAULT_TITLE_COLOR = Color.WHITE;
     private static int DEFAULT_BACKGROUND_COLOR = Color.CYAN;
-    private static final int DEFAULT_VIEW_SIZE = 96;
     private static float DEFAULT_TITLE_SIZE = 25f;
     private static String DEFAULT_TITLE = "A";
 
