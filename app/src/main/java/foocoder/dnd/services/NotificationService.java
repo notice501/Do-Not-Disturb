@@ -52,4 +52,9 @@ public class NotificationService extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification sbn) {
         Timber.d("onNotificationRemoved %d", getCurrentInterruptionFilter());
     }
+
+    @Override
+    public void onInterruptionFilterChanged(int interruptionFilter) {
+        Timber.d("onInterruptionFilterChanged %d", getCurrentInterruptionFilter());
+    }
 }

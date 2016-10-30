@@ -10,10 +10,11 @@ import foocoder.dnd.presentation.internal.di.modules.ApplicationModule;
 import foocoder.dnd.presentation.internal.di.modules.ScheduleModule;
 import foocoder.dnd.presentation.internal.di.modules.SystemServiceModule;
 import foocoder.dnd.presentation.view.fragment.TimeDialogFragment;
+import foocoder.dnd.receivers.CallReceiver;
 import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.services.NotificationService;
-import foocoder.dnd.services.StartStopReceiver;
-import foocoder.dnd.services.TimeReceiver;
+import foocoder.dnd.receivers.StartStopReceiver;
+import foocoder.dnd.receivers.TimeReceiver;
 
 @Singleton
 @Component(modules = {ApplicationModule.class, DeveloperModule.class,
@@ -31,6 +32,8 @@ public interface ApplicationComponent {
     void inject(NotificationService notificationService);
 
     void inject(ListenerService listenerService);
+
+    void inject(CallReceiver.IncomingListener incomingListener);
 
     ContactComponent.Builder contactComponentBuilder();
 

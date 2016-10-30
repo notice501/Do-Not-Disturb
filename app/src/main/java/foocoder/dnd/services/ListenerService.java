@@ -2,7 +2,6 @@ package foocoder.dnd.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -55,10 +54,8 @@ public class ListenerService extends Service {
 
     private void showNotification() {
         Intent i = new Intent(this, MainActivity.class);
-//        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = builder.setContentIntent(pi)
+        Notification notification = builder.setContentIntent(null)
                 .setContentTitle(getString(R.string.running_hint))
                 .setContentText(note)
                 .setSmallIcon(R.drawable.volume_off)

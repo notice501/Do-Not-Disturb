@@ -12,15 +12,15 @@ public abstract class BaseActivity<COMPONENT> extends Activity {
 
     private CompositeSubscription subscriptions = new CompositeSubscription();
 
-    protected ApplicationComponent getApplicationComponent() {
+    ApplicationComponent getApplicationComponent() {
         return ((App) getApplication()).getApplicationComponent();
     }
 
-    protected ActivityModule getActivityModule() {
+    ActivityModule getActivityModule() {
         return new ActivityModule(this);
     }
 
-    protected void addSubscriptionsForUnbinding(Subscription... subscriptions) {
+    void addSubscriptionsForUnbinding(Subscription... subscriptions) {
         for (Subscription subscription : subscriptions) {
             this.subscriptions.add(subscription);
         }

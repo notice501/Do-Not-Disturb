@@ -1,4 +1,4 @@
-package foocoder.dnd.services;
+package foocoder.dnd.receivers;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -16,6 +16,7 @@ import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.interactor.DefaultSubscriber;
 import foocoder.dnd.domain.interactor.ScheduleCase;
 import foocoder.dnd.presentation.App;
+import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 
@@ -57,7 +58,7 @@ public class TimeReceiver extends BroadcastReceiver {
                 int _id = extras.getInt("id", 0);
                 boolean sound_enable = extras.getBoolean("sound_enable", false);
                 boolean cross_night = extras.getBoolean("cross_night", false);
-                scheduleForOp._id = _id % 2 == 0 ? _id : _id - 1;
+                scheduleForOp._id = (_id & 1) == 0 ? _id : _id - 1;
 
                 Intent newIntent = new Intent(context, TimeReceiver.class).setAction(AUTO_TIME_SCHEDULE);
                 newIntent.putExtras(extras);
@@ -67,7 +68,7 @@ public class TimeReceiver extends BroadcastReceiver {
                     @Override
                     public void onNext(Schedule result) {
                         schedule = result;
-                        if (_id % 2 != 0) {
+                        if ((_id & 1) != 0) {
                             daysTillNext = AlarmUtil.daysTillNext(schedule, cross_night);
                         } else {
                             daysTillNext = AlarmUtil.daysTillNext(schedule);

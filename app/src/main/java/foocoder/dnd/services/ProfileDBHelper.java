@@ -1,44 +1,79 @@
 package foocoder.dnd.services;
 
+import android.Manifest;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.CallLog;
+import android.telephony.PhoneNumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import foocoder.dnd.domain.Contact;
 import foocoder.dnd.domain.Schedule;
+import foocoder.dnd.presentation.App;
 
 public class ProfileDBHelper extends SQLiteOpenHelper {
 
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NUMBER = "number";
-    public static final String COLUMN_TIME = "time";
-    public static final String COLUMN_FROM = "start";
-    public static final String COLUMN_TO = "end";
-    public static final String COLUMN_MON = "monday";
-    public static final String COLUMN_TUE = "tuesday";
-    public static final String COLUMN_WED = "wednesday";
-    public static final String COLUMN_THU = "thursday";
-    public static final String COLUMN_FRI = "friday";
-    public static final String COLUMN_SAT = "saturday";
-    public static final String COLUMN_SUN = "sunday";
-    public static final String COLUMN_CONTACT_NAME = "name";
-    public static final String COLUMN_CONTACT_PHONENUM = "phoneNum";
+    private static final String COLUMN_ID = "_id";
+    private static final String COLUMN_FROM = "start";
+    private static final String COLUMN_TO = "end";
+    private static final String COLUMN_MON = "monday";
+    private static final String COLUMN_TUE = "tuesday";
+    private static final String COLUMN_WED = "wednesday";
+    private static final String COLUMN_THU = "thursday";
+    private static final String COLUMN_FRI = "friday";
+    private static final String COLUMN_SAT = "saturday";
+    private static final String COLUMN_SUN = "sunday";
+    private static final String COLUMN_CONTACT_NAME = "name";
+    private static final String COLUMN_CONTACT_PHONENUM = "phoneNum";
 
-    private static final String TABLE_TEMP_NUMBERS = "temp_numbers";
     private static final String TABLE_SCHEDULES = "schedules";
     private static final String TABLE_CONTACTS = "contacts";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "profiles.db";
 
+    private ContentResolver contentResolver;
+
     public ProfileDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        contentResolver = context.getContentResolver();
+    }
+
+    private static String fixNumber(String number) {
+        String fixedNumber = PhoneNumberUtils.normalizeNumber(number);
+        if (number.startsWith("+86")) {
+            fixedNumber = number.replace("+86", "");
+        }
+
+        if (number.startsWith("86") && number.length() > 9) {
+            fixedNumber = number.replaceFirst("^86", "");
+        }
+
+        if (number.startsWith("+400")) {
+            fixedNumber = number.replace("+", "");
+        }
+
+        if (fixedNumber.startsWith("12583")) {
+            fixedNumber = fixedNumber.replaceFirst("^12583.", "");
+        }
+
+        if (fixedNumber.startsWith("1259023")) {
+            fixedNumber = number.replaceFirst("^1259023", "");
+        }
+
+        if (fixedNumber.startsWith("1183348")) {
+            fixedNumber = number.replaceFirst("^1183348", "");
+        }
+
+        return fixedNumber;
     }
 
     @Override
@@ -50,9 +85,6 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
                 + COLUMN_CONTACT_PHONENUM + " TEXT" + ")";
 
         db.execSQL(CREATE_CONTACTS_TABLE);
-
-        String CREATE_TEMP_NUMBERS = "CREATE TABLE " + TABLE_TEMP_NUMBERS + "(" + COLUMN_TIME + " INTEGER PRIMARY KEY, " + COLUMN_NUMBER + " INTEGER" + ")";
-        db.execSQL(CREATE_TEMP_NUMBERS);
 
         String CREATE_TABLE_SCHEDULE = "CREATE TABLE " + TABLE_SCHEDULES + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY, "
@@ -73,43 +105,25 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean saveNumber(String number, long time) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NUMBER, number);
-        values.put(COLUMN_TIME, time);
-
-        long result = db.insert(TABLE_TEMP_NUMBERS, null, values);
-        return result > 0;
-    }
-
-    public int searchNumber(String number) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(TABLE_TEMP_NUMBERS, null, COLUMN_NUMBER + "=?", new String[]{number}, null, null, null);
-
-        int result = c.getCount();
-        c.close();
-        return result;
-    }
-
-    public void scanTempNumbers() {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor c = db.query(true, TABLE_TEMP_NUMBERS, new String[]{COLUMN_NUMBER}, null, null, null, null, null, null);
-        while (c.moveToNext()) {
-            String number = c.getString(0);
-            Cursor cc = db.query(TABLE_TEMP_NUMBERS, new String[]{COLUMN_TIME}, COLUMN_NUMBER + "=?", new String[]{number}, null, null, COLUMN_TIME + " ASC");
-            while (cc.moveToFirst()) {
-                if (System.currentTimeMillis() - cc.getLong(0) > 3 * 60 * 1000) {
-                    db.delete(TABLE_TEMP_NUMBERS, COLUMN_NUMBER + "=?", new String[]{number});
-                    break;
+    public boolean searchNumber(String number, boolean isRepeated) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean found;
+        try (Cursor c = db.query(TABLE_CONTACTS, null, COLUMN_CONTACT_PHONENUM + "=?",
+                new String[]{fixNumber(number)}, null, null, null)) {
+            if (!(found = c.getCount() > 0) && isRepeated) {
+                if (App.getContext().checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+                    long cutOffTime = System.currentTimeMillis() - 3 * 60 * 1000L;
+                    try (Cursor logC = contentResolver.query(
+                            CallLog.Calls.CONTENT_URI, new String[]{CallLog.Calls.NUMBER},
+                            CallLog.Calls.DATE + ">= ? AND " + CallLog.Calls.NUMBER + " = ? ", new String[]{cutOffTime + "", number},
+                            CallLog.Calls.DEFAULT_SORT_ORDER)) {
+                        found = logC != null && logC.moveToNext();
+                    }
                 }
             }
-
-            cc.close();
         }
 
-        c.close();
+        return found;
     }
 
     public boolean saveSchedule(Schedule schedule) throws SQLException {
@@ -128,12 +142,6 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
 
         long result = db.insert(TABLE_SCHEDULES, null, values);
         return result >= 0;
-    }
-
-    public void saveSchedules(List<Schedule> schedules) throws SQLException {
-        for (Schedule schedule : schedules) {
-            saveSchedule(schedule);
-        }
     }
 
     public boolean updateSchedule(Schedule sch) {
@@ -173,7 +181,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             Schedule schedule = new Schedule();
             List<Integer> checked = new ArrayList<>(7);
-            schedule._id= c.getInt(0);
+            schedule._id = c.getInt(0);
             schedule.from = c.getString(1);
             schedule.to = c.getString(2);
 
@@ -230,7 +238,8 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             for (Contact contact : contacts) {
-                db.execSQL("insert into contacts(_id,name,phonenum) values(?,?,?)", new Object[]{contact._id, contact.name, contact.phoneNo});
+                db.execSQL("insert into contacts(_id,name,phonenum) values(?,?,?)", new Object[]{
+                        contact._id, contact.name, fixNumber(contact.phoneNo)});
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {

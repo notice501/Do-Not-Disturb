@@ -6,18 +6,16 @@ import android.media.AudioManager;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import dagger.Lazy;
 import foocoder.dnd.BuildConfig;
 import foocoder.dnd.developer.DeveloperSettings;
-import foocoder.dnd.domain.Contact;
 import foocoder.dnd.presentation.internal.di.components.ApplicationComponent;
 import foocoder.dnd.presentation.internal.di.components.DaggerApplicationComponent;
 import foocoder.dnd.presentation.internal.di.modules.ApplicationModule;
+import foocoder.dnd.receivers.CallReceiver;
 import foocoder.dnd.services.ProfileDBHelper;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 import timber.log.Timber;
@@ -54,6 +52,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
 
         this.applicationComponent = provideApplicationComponent();
 
@@ -65,8 +64,7 @@ public class App extends Application {
             ButterKnife.setDebug(BuildConfig.DEBUG);
             developerSettingsLazy.get().apply();
         }
-
-        instance = this;
+        CallReceiver.IncomingListener.init(this);
     }
 
     public ApplicationComponent getApplicationComponent() {
@@ -89,24 +87,5 @@ public class App extends Application {
 
     public AlarmManager getAlarmManager() {
         return this.alarmManager;
-    }
-
-    public boolean hasNumber(String number) {
-//        long cutOffTime = System.currentTimeMillis() - 3 * 60 * 1000L;
-//        Cursor c = getContentResolver().query(
-//                CallLog.Calls.CONTENT_URI, new String[]{CallLog.Calls.NUMBER},
-//                CallLog.Calls.DATE + ">= ? AND " + CallLog.Calls.NUMBER + " = ? ", new String[]{cutOffTime + "", number},
-//                CallLog.Calls.DEFAULT_SORT_ORDER);
-//
-//        return c != null && c.moveToNext();
-        return false;
-    }
-
-    public void scanNumbers() {
-        dbHelper.scanTempNumbers();
-    }
-
-    public List<Contact> getContacts() {
-        return dbHelper.getContacts();
     }
 }

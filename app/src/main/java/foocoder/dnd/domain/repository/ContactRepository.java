@@ -12,4 +12,6 @@ public interface ContactRepository {
     Observable<Contact> contact(int _id);
 
     Observable saveContacts(List<Contact> contacts);
+
+    Observable<Boolean> searchContact(String number, boolean isRepeated);
 }

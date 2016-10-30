@@ -16,7 +16,7 @@ import foocoder.dnd.R;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.presentation.App;
 import foocoder.dnd.services.ListenerService;
-import foocoder.dnd.services.TimeReceiver;
+import foocoder.dnd.receivers.TimeReceiver;
 
 import static android.app.AlarmManager.RTC_WAKEUP;
 import static android.media.AudioManager.RINGER_MODE_NORMAL;

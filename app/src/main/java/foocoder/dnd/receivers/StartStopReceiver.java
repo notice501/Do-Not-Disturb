@@ -1,4 +1,4 @@
-package foocoder.dnd.services;
+package foocoder.dnd.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,6 +14,7 @@ import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.domain.interactor.DefaultSubscriber;
 import foocoder.dnd.domain.interactor.ScheduleCase;
 import foocoder.dnd.presentation.App;
+import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 
@@ -63,9 +64,9 @@ public class StartStopReceiver extends BroadcastReceiver {
             if (sp.isLaunched()) {
                 if (sp.isVib()) {
                     audioManager.setRingerMode(RINGER_MODE_VIBRATE);
+                } else {
+                    audioManager.setRingerMode(RINGER_MODE_SILENT);
                 }
-            } else {
-                audioManager.setRingerMode(RINGER_MODE_SILENT);
             }
         } else {
             sp.start(false);

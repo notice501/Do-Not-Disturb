@@ -16,41 +16,76 @@ public class PinyinUtil {
     private static List<String> multiplePinyin;
 
     static {
-        multipleName = new ArrayList<String>();  multiplePinyin = new ArrayList<String>();
-        multipleName.add("秘");                  multiplePinyin.add("bi");
-        multipleName.add("卜");                  multiplePinyin.add("bu");
-        multipleName.add("长");                  multiplePinyin.add("chang");
-        multipleName.add("种");                  multiplePinyin.add("chong");
-        multipleName.add("重");                  multiplePinyin.add("chong");
-        multipleName.add("刀");                  multiplePinyin.add("diao");
-        multipleName.add("干");                  multiplePinyin.add("gan");
-        multipleName.add("葛");                  multiplePinyin.add("ge");
-        multipleName.add("盖");                  multiplePinyin.add("ge");
-        multipleName.add("过");                  multiplePinyin.add("guo");
-        multipleName.add("华");                  multiplePinyin.add("hua");
-        multipleName.add("纪");                  multiplePinyin.add("ji");
-        multipleName.add("筠");                  multiplePinyin.add("jun");
-        multipleName.add("牟");                  multiplePinyin.add("mu");
-        multipleName.add("区");                  multiplePinyin.add("ou");
-        multipleName.add("繁");                  multiplePinyin.add("po");
-        multipleName.add("仇");                  multiplePinyin.add("qiu");
-        multipleName.add("任");                  multiplePinyin.add("ren");
-        multipleName.add("单");                  multiplePinyin.add("shan");
-        multipleName.add("召");                  multiplePinyin.add("shao");
-        multipleName.add("折");                  multiplePinyin.add("she");
-        multipleName.add("舍");                  multiplePinyin.add("she");
-        multipleName.add("沈");                  multiplePinyin.add("shen");
-        multipleName.add("峙");                  multiplePinyin.add("shi");
-        multipleName.add("隗");                  multiplePinyin.add("wei");
-        multipleName.add("解");                  multiplePinyin.add("xie");
-        multipleName.add("莘");                  multiplePinyin.add("xin");
-        multipleName.add("燕");                  multiplePinyin.add("yan");
-        multipleName.add("尉");                  multiplePinyin.add("yu");
-        multipleName.add("乐");                  multiplePinyin.add("yue");
-        multipleName.add("员");                  multiplePinyin.add("yun");
-        multipleName.add("查");                  multiplePinyin.add("zha");
-        multipleName.add("翟");                  multiplePinyin.add("zhai");
-        multipleName.add("曾");                  multiplePinyin.add("zeng");
+        multipleName = new ArrayList<>();
+        multiplePinyin = new ArrayList<>();
+        multipleName.add("秘");
+        multiplePinyin.add("bi");
+        multipleName.add("卜");
+        multiplePinyin.add("bu");
+        multipleName.add("长");
+        multiplePinyin.add("chang");
+        multipleName.add("种");
+        multiplePinyin.add("chong");
+        multipleName.add("重");
+        multiplePinyin.add("chong");
+        multipleName.add("刀");
+        multiplePinyin.add("diao");
+        multipleName.add("干");
+        multiplePinyin.add("gan");
+        multipleName.add("葛");
+        multiplePinyin.add("ge");
+        multipleName.add("盖");
+        multiplePinyin.add("ge");
+        multipleName.add("过");
+        multiplePinyin.add("guo");
+        multipleName.add("华");
+        multiplePinyin.add("hua");
+        multipleName.add("纪");
+        multiplePinyin.add("ji");
+        multipleName.add("筠");
+        multiplePinyin.add("jun");
+        multipleName.add("牟");
+        multiplePinyin.add("mu");
+        multipleName.add("区");
+        multiplePinyin.add("ou");
+        multipleName.add("繁");
+        multiplePinyin.add("po");
+        multipleName.add("仇");
+        multiplePinyin.add("qiu");
+        multipleName.add("任");
+        multiplePinyin.add("ren");
+        multipleName.add("单");
+        multiplePinyin.add("shan");
+        multipleName.add("召");
+        multiplePinyin.add("shao");
+        multipleName.add("折");
+        multiplePinyin.add("she");
+        multipleName.add("舍");
+        multiplePinyin.add("she");
+        multipleName.add("沈");
+        multiplePinyin.add("shen");
+        multipleName.add("峙");
+        multiplePinyin.add("shi");
+        multipleName.add("隗");
+        multiplePinyin.add("wei");
+        multipleName.add("解");
+        multiplePinyin.add("xie");
+        multipleName.add("莘");
+        multiplePinyin.add("xin");
+        multipleName.add("燕");
+        multiplePinyin.add("yan");
+        multipleName.add("尉");
+        multiplePinyin.add("yu");
+        multipleName.add("乐");
+        multiplePinyin.add("yue");
+        multipleName.add("员");
+        multiplePinyin.add("yun");
+        multipleName.add("查");
+        multiplePinyin.add("zha");
+        multipleName.add("翟");
+        multiplePinyin.add("zhai");
+        multipleName.add("曾");
+        multiplePinyin.add("zeng");
 
     }
 
@@ -99,7 +134,7 @@ public class PinyinUtil {
                 }
             }
 
-            String[] pinyinArray = PinyinHelper.toHanyuPinyinStringArray(word,getDefaultOutputFormat());
+            String[] pinyinArray = PinyinHelper.toHanyuPinyinStringArray(word, getDefaultOutputFormat());
             if (pinyinArray != null) {
                 convert += pinyinArray[0].charAt(0);
             } else {
@@ -112,7 +147,7 @@ public class PinyinUtil {
     public static String getPinYinInitChar(String str) {
         String init = "";
         try {
-            init = str.substring(0,1);
+            init = str.substring(0, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

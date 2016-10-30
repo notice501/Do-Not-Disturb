@@ -32,7 +32,7 @@ public class ContactDataRepository implements ContactRepository {
     private String[] colors;
 
     @Inject
-    public ContactDataRepository(ProfileDBHelper helper, Application context) {
+    ContactDataRepository(ProfileDBHelper helper, Application context) {
         this.helper = helper;
         this.context = context;
         this.colors = context.getResources().getStringArray(R.array.colors);
@@ -121,5 +121,10 @@ public class ContactDataRepository implements ContactRepository {
                 subscriber.onError(e);
             }
         });
+    }
+
+    @Override
+    public Observable<Boolean> searchContact(String number, boolean isRepeated) {
+        return Observable.fromCallable(() -> helper.searchNumber(number, isRepeated));
     }
 }
