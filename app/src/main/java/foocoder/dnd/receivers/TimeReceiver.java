@@ -1,14 +1,13 @@
 package foocoder.dnd.receivers;
 
 import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 
-import org.joda.time.DateTime;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -20,7 +19,6 @@ import foocoder.dnd.services.ListenerService;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 
-import static android.app.AlarmManager.RTC_WAKEUP;
 import static foocoder.dnd.presentation.App.AUTO_TIME_SCHEDULE;
 
 public class TimeReceiver extends BroadcastReceiver {
@@ -35,14 +33,7 @@ public class TimeReceiver extends BroadcastReceiver {
     SharedPreferenceUtil spUtil;
 
     @Inject
-    ScheduleCase<Schedule> getSchedule;
-
-    @Inject
-    Schedule scheduleForOp;
-
-    private Schedule schedule;
-
-    private int daysTillNext;
+    ScheduleCase<List<Schedule>> getSchedules;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -50,37 +41,14 @@ public class TimeReceiver extends BroadcastReceiver {
         Bundle extras = intent.getExtras();
 
         if (AUTO_TIME_SCHEDULE.equals(intent.getAction())) {
-            if (extras.getBoolean("notify", false)) {
-                scheduleForOp._id = spUtil.getRunningId();
-                AlarmUtil.setSilent(true, schedule);
-                AlarmUtil.startSchedule(schedule);
-            } else {
-                int _id = extras.getInt("id", 0);
-                boolean sound_enable = extras.getBoolean("sound_enable", false);
-                boolean cross_night = extras.getBoolean("cross_night", false);
-                scheduleForOp._id = (_id & 1) == 0 ? _id : _id - 1;
 
-                Intent newIntent = new Intent(context, TimeReceiver.class).setAction(AUTO_TIME_SCHEDULE);
-                newIntent.putExtras(extras);
-                PendingIntent pendingIntent = AlarmUtil.getPendingIntent(context, _id, newIntent);
-
-                getSchedule.execute(new DefaultSubscriber<Schedule>() {
+                getSchedules.execute(new DefaultSubscriber<List<Schedule>>() {
                     @Override
-                    public void onNext(Schedule result) {
-                        schedule = result;
-                        if ((_id & 1) != 0) {
-                            daysTillNext = AlarmUtil.daysTillNext(schedule, cross_night);
-                        } else {
-                            daysTillNext = AlarmUtil.daysTillNext(schedule);
-                        }
-                        DateTime trigger = DateTime.now().plusDays(daysTillNext);
-
-                        alarmManager.setExact(RTC_WAKEUP, trigger.getMillis(), pendingIntent);
-
-                        AlarmUtil.setSilent(sound_enable, schedule);
+                    public void onNext(List<Schedule> result) {
+                        AlarmUtil.start(result);
                     }
                 });
-            }
+
         } else {
             if (audioManager.getRingerMode() > 1) {
                 if (spUtil.isUsable()) {

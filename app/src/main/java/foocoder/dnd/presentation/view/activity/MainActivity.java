@@ -184,11 +184,12 @@ public final class MainActivity extends BaseActivity<MainComponent> implements M
 
         if (isChecked) {
             if (!sp.isStarted()) {
-                if (mainPresenter.getSchedules().size() > 0) {
-                    for (Schedule schedule : mainPresenter.getSchedules()) {
-                        AlarmUtil.startSchedule(schedule);
-                    }
-                }
+//                if (mainPresenter.getSchedules().size() > 0) {
+//                    for (Schedule schedule : mainPresenter.getSchedules()) {
+//                        AlarmUtil.startSchedule(schedule);
+//                    }
+//                }
+                AlarmUtil.start(mainPresenter.getSchedules());
             }
         } else {
             if (!sp.isStarted()) {

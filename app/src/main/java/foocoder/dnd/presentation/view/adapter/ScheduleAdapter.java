@@ -66,7 +66,7 @@ public class ScheduleAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        ButterKnife.apply(holder.dayViews, setter, schedule.checked);
+        ButterKnife.apply(holder.dayViews, setter, schedule.days);
 
         holder.times.setText(schedule.from + "—" + schedule.to);
 

@@ -19,6 +19,8 @@ import foocoder.dnd.domain.Contact;
 import foocoder.dnd.domain.Schedule;
 import foocoder.dnd.presentation.App;
 
+import static foocoder.dnd.utils.TimeUtil.tryParseHourAndMinute;
+
 public class ProfileDBHelper extends SQLiteOpenHelper {
 
     private static final String COLUMN_ID = "_id";
@@ -132,13 +134,13 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_ID, schedule._id);
         values.put(COLUMN_FROM, schedule.from);
         values.put(COLUMN_TO, schedule.to);
-        values.put(COLUMN_MON, schedule.checked.get(0));
-        values.put(COLUMN_TUE, schedule.checked.get(1));
-        values.put(COLUMN_WED, schedule.checked.get(2));
-        values.put(COLUMN_THU, schedule.checked.get(3));
-        values.put(COLUMN_FRI, schedule.checked.get(4));
-        values.put(COLUMN_SAT, schedule.checked.get(5));
-        values.put(COLUMN_SUN, schedule.checked.get(6));
+        values.put(COLUMN_MON, schedule.days.get(0));
+        values.put(COLUMN_TUE, schedule.days.get(1));
+        values.put(COLUMN_WED, schedule.days.get(2));
+        values.put(COLUMN_THU, schedule.days.get(3));
+        values.put(COLUMN_FRI, schedule.days.get(4));
+        values.put(COLUMN_SAT, schedule.days.get(5));
+        values.put(COLUMN_SUN, schedule.days.get(6));
 
         long result = db.insert(TABLE_SCHEDULES, null, values);
         return result >= 0;
@@ -150,13 +152,13 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_ID, sch._id);
         values.put(COLUMN_FROM, sch.from);
         values.put(COLUMN_TO, sch.to);
-        values.put(COLUMN_MON, sch.checked.get(0));
-        values.put(COLUMN_TUE, sch.checked.get(1));
-        values.put(COLUMN_WED, sch.checked.get(2));
-        values.put(COLUMN_THU, sch.checked.get(3));
-        values.put(COLUMN_FRI, sch.checked.get(4));
-        values.put(COLUMN_SAT, sch.checked.get(5));
-        values.put(COLUMN_SUN, sch.checked.get(6));
+        values.put(COLUMN_MON, sch.days.get(0));
+        values.put(COLUMN_TUE, sch.days.get(1));
+        values.put(COLUMN_WED, sch.days.get(2));
+        values.put(COLUMN_THU, sch.days.get(3));
+        values.put(COLUMN_FRI, sch.days.get(4));
+        values.put(COLUMN_SAT, sch.days.get(5));
+        values.put(COLUMN_SUN, sch.days.get(6));
 
         int result = db.update(TABLE_SCHEDULES, values, COLUMN_ID + "=?", new String[]{sch._id + ""});
         return result > 0;
@@ -179,20 +181,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         }
 
         while (c.moveToNext()) {
-            Schedule schedule = new Schedule();
-            List<Integer> checked = new ArrayList<>(7);
-            schedule._id = c.getInt(0);
-            schedule.from = c.getString(1);
-            schedule.to = c.getString(2);
-
-            checked.add(c.getInt(3));
-            checked.add(c.getInt(4));
-            checked.add(c.getInt(5));
-            checked.add(c.getInt(6));
-            checked.add(c.getInt(7));
-            checked.add(c.getInt(8));
-            checked.add(c.getInt(9));
-            schedule.checked = checked;
+            Schedule schedule = parseSchedule(c);
 
             schedules.add(schedule);
         }
@@ -209,20 +198,7 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         Cursor c = db.query(TABLE_SCHEDULES, null, COLUMN_ID + "=?", new String[]{_id + ""}, null, null, null);
         if (c != null) {
             while (c.moveToNext()) {
-                schedule = new Schedule();
-                List<Integer> checked = new ArrayList<>(7);
-                schedule._id = c.getInt(0);
-                schedule.from = c.getString(1);
-                schedule.to = c.getString(2);
-
-                checked.add(c.getInt(3));
-                checked.add(c.getInt(4));
-                checked.add(c.getInt(5));
-                checked.add(c.getInt(6));
-                checked.add(c.getInt(7));
-                checked.add(c.getInt(8));
-                checked.add(c.getInt(9));
-                schedule.checked = checked;
+                schedule = parseSchedule(c);
             }
         }
 
@@ -277,4 +253,32 @@ public class ProfileDBHelper extends SQLiteOpenHelper {
         int result = db.delete(TABLE_CONTACTS, null, null);
         return result > 0;
     }
+
+    private Schedule parseSchedule(Cursor cursor) {
+        Schedule schedule = new Schedule();
+        schedule._id = cursor.getInt(0);
+        schedule.from = cursor.getString(1);
+        schedule.to = cursor.getString(2);
+        int[] start = tryParseHourAndMinute(schedule.from);
+        int[] end = tryParseHourAndMinute(schedule.to);
+        schedule.startHour = start[0];
+        schedule.startMinute = start[1];
+        schedule.endHour = end[0];
+        schedule.endMinute = end[1];
+
+        List<Integer> checked = new ArrayList<>(7);
+        checked.add(cursor.getInt(3));
+        checked.add(cursor.getInt(4));
+        checked.add(cursor.getInt(5));
+        checked.add(cursor.getInt(6));
+        checked.add(cursor.getInt(7));
+        checked.add(cursor.getInt(8));
+        checked.add(cursor.getInt(9));
+        schedule.days = checked;
+
+        return schedule;
+    }
+
+
+
 }

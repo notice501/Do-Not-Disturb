@@ -13,8 +13,7 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 
-import org.joda.time.DateTime;
-
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,7 +65,7 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
 
     private TimePickerDialog timePicker;
 
-    private DateTime dateTime = DateTime.now();
+    private Calendar dateTime = Calendar.getInstance();
 
     public static TimeDialogFragment newInstance(@Nullable Schedule schedule) {
         Bundle args = new Bundle();
@@ -143,8 +142,8 @@ public class TimeDialogFragment extends DialogFragment implements TimeSelectView
             hour = Integer.parseInt(times[0]);
             minute = Integer.parseInt(times[1]);
         } else {
-            hour = dateTime.getHourOfDay();
-            minute = dateTime.getMinuteOfHour();
+            hour = dateTime.get(Calendar.HOUR_OF_DAY);
+            minute = dateTime.get(Calendar.MINUTE);
         }
         timePicker = new TimePickerDialog(getActivity(), (view, hourOfDay, minute1) -> {
             TextView.class.cast(aView).setText(trans(hourOfDay) + ":" + trans(minute1));

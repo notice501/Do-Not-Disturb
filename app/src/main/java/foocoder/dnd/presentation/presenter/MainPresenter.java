@@ -15,6 +15,8 @@ import foocoder.dnd.presentation.view.MainSettingView;
 import foocoder.dnd.utils.AlarmUtil;
 import foocoder.dnd.utils.SharedPreferenceUtil;
 
+import static foocoder.dnd.utils.TimeUtil.tryParseHourAndMinute;
+
 @PerActivity
 public class MainPresenter extends Presenter<MainSettingView> {
 
@@ -43,7 +45,7 @@ public class MainPresenter extends Presenter<MainSettingView> {
     ScheduleCase<List<Schedule>> getScheduleList;
 
     @Inject
-    public MainPresenter() {}
+    MainPresenter() {}
 
     @Override
     public void start() {
@@ -79,12 +81,18 @@ public class MainPresenter extends Presenter<MainSettingView> {
     }
 
     public void addSchedule(Schedule schedule) {
-        spUtil.setId(schedule._id = spUtil.getId() + 2);
+        int[] start = tryParseHourAndMinute(schedule.from);
+        int[] end = tryParseHourAndMinute(schedule.to);
+        schedule.startHour = start[0];
+        schedule.startMinute = start[1];
+        schedule.endHour = end[0];
+        schedule.endMinute = end[1];
         this.schedule.copy(schedule);
-        if (!spUtil.isStarted()) {
-            AlarmUtil.startSchedule(schedule);
-        }
         schedules.add(schedule);
+        if (!spUtil.isStarted()) {
+//            AlarmUtil.startSchedule(schedule);
+            AlarmUtil.start(schedules);
+        }
         addSubscriptionsForUnbinding(saveSchedule.execute(new OperationSubscriber()));
     }
 
@@ -92,15 +100,17 @@ public class MainPresenter extends Presenter<MainSettingView> {
         this.schedule.copy(schedule);
         this.schedules.set(position, schedule);
         if (!spUtil.isStarted()) {
-            AlarmUtil.startSchedule(schedule);
+//            AlarmUtil.startSchedule(schedule);
+            AlarmUtil.start(schedules);
         }
         addSubscriptionsForUnbinding(updateSchedule.execute(new OperationSubscriber()));
     }
 
     public void deleteSchedule(Schedule schedule) {
-        AlarmUtil.cancelOldAlarm(schedule);
+//        AlarmUtil.cancelOldAlarm(schedule);
         this.schedule.copy(schedule);
         this.schedules.remove(schedule);
+        AlarmUtil.start(schedules);
         if (schedules.size() == 0) {
             spUtil.setRunningId(-1);
         }

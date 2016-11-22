@@ -19,37 +19,47 @@ public class Schedule implements Parcelable {
             return new Schedule[size];
         }
     };
-
     public int _id;
-
     public String from;
-
     public String to;
-
-    public List<Integer> checked;
-
+    public int startHour;
+    public int startMinute;
+    public int endHour;
+    public int endMinute;
+    public List<Integer> days;
     public boolean del;
-
-    public boolean running;
 
     public Schedule() {}
 
     public Schedule(String from, String to, List<Integer> checked) {
         this.from = from;
         this.to = to;
-        this.checked = checked;
+        this.days = checked;
         this.del = false;
-        this.running = false;
     }
 
     protected Schedule(Parcel in) {
         this._id = in.readInt();
         this.from = in.readString();
         this.to = in.readString();
-        this.checked = new ArrayList<>();
-        in.readList(this.checked, Integer.class.getClassLoader());
+        this.startHour = in.readInt();
+        this.startMinute = in.readInt();
+        this.endHour = in.readInt();
+        this.endMinute = in.readInt();
+        this.days = new ArrayList<>();
+        in.readList(this.days, Integer.class.getClassLoader());
         this.del = in.readByte() != 0;
-        this.running = in.readByte() != 0;
+    }
+
+    public void copy(Schedule schedule) {
+        this._id = schedule._id;
+        this.from = schedule.from;
+        this.to = schedule.to;
+        this.days = schedule.days;
+        this.endHour = schedule.startHour;
+        this.startMinute = schedule.startMinute;
+        this.endHour = schedule.endHour;
+        this.endMinute = schedule.endMinute;
     }
 
     @Override
@@ -62,15 +72,11 @@ public class Schedule implements Parcelable {
         dest.writeInt(this._id);
         dest.writeString(this.from);
         dest.writeString(this.to);
-        dest.writeList(this.checked);
-        dest.writeByte(del ? (byte) 1 : (byte) 0);
-        dest.writeByte(running ? (byte) 1 : (byte) 0);
-    }
-
-    public void copy(Schedule schedule) {
-        this._id = schedule._id;
-        this.from = schedule.from;
-        this.to = schedule.to;
-        this.checked = schedule.checked;
+        dest.writeInt(this.startHour);
+        dest.writeInt(this.startMinute);
+        dest.writeInt(this.endHour);
+        dest.writeInt(this.endMinute);
+        dest.writeList(this.days);
+        dest.writeByte(this.del ? (byte) 1 : (byte) 0);
     }
 }

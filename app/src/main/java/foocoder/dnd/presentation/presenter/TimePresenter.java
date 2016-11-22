@@ -39,7 +39,7 @@ public class TimePresenter extends Presenter<TimeSelectView> {
     public void setSchedule(@Nullable Schedule schedule) {
         this.schedule = schedule;
         if (schedule != null) {
-            checkedDays = schedule.checked;
+            checkedDays = schedule.days;
         }
     }
 
@@ -55,7 +55,7 @@ public class TimePresenter extends Presenter<TimeSelectView> {
         } else {
             schedule.from = from;
             schedule.to = to;
-            schedule.checked = checkedDays;
+            schedule.days = checkedDays;
         }
         return schedule;
     }

@@ -4,8 +4,6 @@ import android.app.AlarmManager;
 import android.app.Application;
 import android.media.AudioManager;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -57,7 +55,6 @@ public class App extends Application {
         this.applicationComponent = provideApplicationComponent();
 
         this.applicationComponent.inject(this);
-        JodaTimeAndroid.init(this);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());

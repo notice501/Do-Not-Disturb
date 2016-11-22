@@ -78,9 +78,7 @@ public class StartStopReceiver extends BroadcastReceiver {
                 getSchedules.execute(new DefaultSubscriber<List<Schedule>>() {
                     @Override
                     public void onNext(List<Schedule> schedules) {
-                        for (Schedule schedule : schedules) {
-                            AlarmUtil.startSchedule(schedule);
-                        }
+                            AlarmUtil.start(schedules);
                     }
                 });
             }
