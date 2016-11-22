@@ -14,9 +14,9 @@ android {
         versionCode 1
         versionName "1.0"
 
-        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
 
     lintOptions {
@@ -68,7 +68,6 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'com.google.dagger:dagger:2.7'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.7'
-    compile 'net.danlew:android.joda:2.9.4.2'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     debugCompile 'com.facebook.stetho:stetho:1.4.1'
     provided 'org.glassfish:javax.annotation:10.0-b28'
